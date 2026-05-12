@@ -4,6 +4,8 @@ import { formatQueueNumber } from '../../../utils/queueNumber';
 export const BookingTable = ({
   bookings = [],
   onCallNext,
+  onStartService,
+  onCompleteBooking,
   onCancelBooking,
   onDeleteBooking,
   onOpenTv,
@@ -42,6 +44,20 @@ export const BookingTable = ({
           <span className="flex items-center gap-1.5 text-secondary">
             <span className="material-symbols-outlined text-[18px]">task_alt</span>
             <span className="font-label-md">Completed</span>
+          </span>
+        );
+      case 'checked_in':
+        return (
+          <span className="flex items-center gap-1.5 text-amber-600">
+            <span className="material-symbols-outlined text-[18px]">login</span>
+            <span className="font-label-md">Checked-in</span>
+          </span>
+        );
+      case 'in_progress':
+        return (
+          <span className="flex items-center gap-1.5 text-indigo-600">
+            <span className="material-symbols-outlined text-[18px]">autoplay</span>
+            <span className="font-label-md">In Progress</span>
           </span>
         );
       default: return null;
@@ -104,6 +120,22 @@ export const BookingTable = ({
                     className="inline-flex items-center gap-1 bg-primary text-on-primary px-3 py-1.5 rounded-full text-xs font-semibold"
                   >
                     <span className="material-symbols-outlined text-[14px]">campaign</span> Call
+                  </button>
+                )}
+                {(booking.status === 'checked_in' || booking.status === 'confirmed') && (
+                  <button
+                    onClick={() => onStartService?.(booking.id)}
+                    className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-semibold"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">autoplay</span> Start
+                  </button>
+                )}
+                {booking.status === 'in_progress' && (
+                  <button
+                    onClick={() => onCompleteBooking?.(booking.id)}
+                    className="inline-flex items-center gap-1 bg-secondary-container text-on-secondary-container px-3 py-1.5 rounded-full text-xs font-semibold"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">task_alt</span> Complete
                   </button>
                 )}
                 {booking.status !== 'cancelled' && booking.status !== 'completed' && (
@@ -188,6 +220,22 @@ export const BookingTable = ({
                         className="inline-flex items-center gap-1 bg-primary text-on-primary px-3 py-1.5 rounded-full text-xs font-semibold hover:bg-primary-fixed-dim transition-all"
                       >
                         <span className="material-symbols-outlined text-[14px]">campaign</span> Call
+                      </button>
+                    )}
+                    {(booking.status === 'checked_in' || booking.status === 'confirmed') && (
+                      <button
+                        onClick={() => onStartService?.(booking.id)}
+                        className="inline-flex items-center gap-1 bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full text-xs font-semibold"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">autoplay</span> Start
+                      </button>
+                    )}
+                    {booking.status === 'in_progress' && (
+                      <button
+                        onClick={() => onCompleteBooking?.(booking.id)}
+                        className="inline-flex items-center gap-1 bg-secondary-container text-on-secondary-container px-3 py-1.5 rounded-full text-xs font-semibold"
+                      >
+                        <span className="material-symbols-outlined text-[14px]">task_alt</span> Complete
                       </button>
                     )}
                     {booking.status !== 'cancelled' && booking.status !== 'completed' && (

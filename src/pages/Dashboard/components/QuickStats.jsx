@@ -1,7 +1,8 @@
 import React from 'react';
 
-export const QuickStats = ({ bookings = [] }) => {
-  const confirmedCount = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed').length;
+export const QuickStats = ({ bookings = [], staff = [] }) => {
+  const confirmedCount = bookings.filter((b) => b.status === 'confirmed' || b.status === 'completed' || b.status === 'in_progress').length;
+  const activeStaffCount = staff.filter((member) => String(member.status || '').toLowerCase() !== 'off').length;
   
   return (
     <section className="glass-card rounded-[32px] p-container-padding">
@@ -16,7 +17,7 @@ export const QuickStats = ({ bookings = [] }) => {
             <span className="text-headline-xl font-headline-xl">{bookings.length}</span>
             <span className="material-symbols-outlined text-primary text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>arrow_drop_up</span>
           </div>
-          <span className="text-label-sm text-on-surface-variant mt-2">+3 vs yesterday</span>
+          <span className="text-label-sm text-on-surface-variant mt-2">Live from Firestore</span>
         </div>
         
         <div className="bg-surface-container-low rounded-3xl p-6 flex flex-col items-center text-center">
@@ -25,9 +26,9 @@ export const QuickStats = ({ bookings = [] }) => {
           </div>
           <span className="text-label-md text-on-secondary-container">Staff Working Today</span>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-headline-xl font-headline-xl">4 / 5</span>
+            <span className="text-headline-xl font-headline-xl">{activeStaffCount} / {staff.length}</span>
           </div>
-          <span className="text-label-sm text-on-surface-variant mt-2">1 staff on leave</span>
+          <span className="text-label-sm text-on-surface-variant mt-2">{Math.max(0, staff.length - activeStaffCount)} staff not active</span>
         </div>
         
         <div className="bg-surface-container-low rounded-3xl p-6 flex flex-col items-center text-center">

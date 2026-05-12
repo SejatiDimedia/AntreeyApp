@@ -12,7 +12,9 @@ import { useState, useEffect } from 'react';
 export const DashboardPage = () => {
   const { currentUser } = useAuth();
   const { activeBusiness, loading: businessLoading } = useBusiness();
-  const [bookings, setBookings] = useState([]);
+  const [todayBookings, setTodayBookings] = useState([]);
+  const [allBookings, setAllBookings] = useState([]);
+  const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,13 +29,39 @@ export const DashboardPage = () => {
       activeBusiness.id,
       todayStr,
       (data) => {
-        setBookings(data);
+        setTodayBookings(data);
         setLoading(false);
       }
     );
 
     return () => unsubscribe();
   }, [activeBusiness]);
+
+  useEffect(() => {
+    if (!activeBusiness?.id) {
+      setAllBookings([]);
+      return;
+    }
+    const unsubscribe = BookingRepository.subscribeToAllBookings(activeBusiness.id, setAllBookings);
+    return () => unsubscribe();
+  }, [activeBusiness?.id]);
+
+  useEffect(() => {
+    async function loadStaff() {
+      if (!activeBusiness?.id) {
+        setStaff([]);
+        return;
+      }
+      try {
+        const data = await BusinessRepository.getStaff(activeBusiness.id);
+        setStaff(data);
+      } catch (error) {
+        console.error('Failed to load staff for dashboard:', error);
+        setStaff([]);
+      }
+    }
+    loadStaff();
+  }, [activeBusiness?.id]);
 
   if (businessLoading || loading) {
     return (
@@ -80,14 +108,14 @@ export const DashboardPage = () => {
     <div className="grid grid-cols-12 gap-card-gap pb-12 relative z-10">
       {/* Left Side: Stats and Schedule */}
       <div className="col-span-12 lg:col-span-8 flex flex-col gap-card-gap">
-        <QuickStats bookings={bookings} />
-        <TodaysSchedule bookings={bookings} />
+        <QuickStats bookings={todayBookings} staff={staff} />
+        <TodaysSchedule bookings={todayBookings} />
       </div>
 
       {/* Right Side: Calendar and Analytics */}
       <div className="col-span-12 lg:col-span-4 flex flex-col gap-card-gap">
-        <CalendarWidget />
-        <WeeklyChart />
+        <CalendarWidget bookings={allBookings} />
+        <WeeklyChart bookings={allBookings} />
       </div>
 
     </div>

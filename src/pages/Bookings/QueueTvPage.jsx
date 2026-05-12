@@ -45,7 +45,12 @@ export const QueueTvPage = () => {
     return normalized;
   }, [bookings, today]);
 
-  const nowServing = todaysBookings.find((item) => item.status === 'confirmed') || todaysBookings[0] || null;
+  const nowServing =
+    todaysBookings.find((item) => item.status === 'in_progress') ||
+    todaysBookings.find((item) => item.status === 'confirmed') ||
+    todaysBookings.find((item) => item.status === 'checked_in') ||
+    todaysBookings[0] ||
+    null;
   const waiting = todaysBookings
     .filter((item) => item.status === 'pending')
     .slice(0, 6);
@@ -60,8 +65,13 @@ export const QueueTvPage = () => {
       const sorted = [...rows].sort((a, b) => Number(a.queueNo || 0) - Number(b.queueNo || 0));
       return {
         serviceName,
-        nowServing: sorted.find((item) => item.status === 'confirmed') || sorted[0] || null,
-        waiting: sorted.filter((item) => item.status === 'pending').slice(0, 5)
+        nowServing:
+          sorted.find((item) => item.status === 'in_progress') ||
+          sorted.find((item) => item.status === 'confirmed') ||
+          sorted.find((item) => item.status === 'checked_in') ||
+          sorted[0] ||
+          null,
+        waiting: sorted.filter((item) => item.status === 'pending' || item.status === 'checked_in').slice(0, 5)
       };
     });
   }, [todaysBookings]);

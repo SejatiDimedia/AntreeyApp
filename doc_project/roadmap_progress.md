@@ -2,7 +2,7 @@
 
 Document updated: 2026-05-12
 
-## 📊 Overall Progress: 95%
+## 📊 Overall Progress: 97%
 Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now moving into the final logic integration and AI enhancement phases.
 
 ---
@@ -75,6 +75,11 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Owner Calendar Integration**: Booking table now syncs with selected calendar date and calendar shows booking count badges per day.
 - [x] **Walk-in Booking UI**: Added owner modal for walk-in creation (service/date/start time/duration) with Sonner feedback.
 - [x] **My Bookings + Ticket Consistency**: Customer can open ticket detail from my bookings with the same ticket-style UI flow.
+- [x] **Bookings Filter Wiring**: Service + status filters now connected to live Firestore data (no dummy data).
+- [x] **Owner Booking Actions**: Added owner/staff booking actions for Call, Cancel, and Delete with custom confirmation modal.
+- [x] **Owner Check-in Flow**: Added Check-in by booking code with modal input and camera QR scanner support.
+- [x] **Customer Ticket Realtime Stats**: `Ahead of you` and `Est. Wait` now calculated from realtime queue data (not dummy).
+- [x] **Bookings Responsive Upgrade**: Improved mobile/tablet layout for bookings table/cards, filters, and top app bar.
 
 ### Phase 8.5: Role-Based Access Control (RBAC) (IN PROGRESS)
 - [x] **Role Definition**: Implement `role` logic in `AuthContext` (Owner, Staff, Customer).
@@ -101,5 +106,6 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Resource-aware Availability**: Overlap prevention now checks service/resource/staff constraints and time range.
 - [x] **Slot Generation from Real Availability**: Customer app disables slots using realtime overlap checks (including walk-in ranges).
 - [x] **Atomic Booking Validation on Submit**: Conflict re-check enforced at submit in repository before write.
-- [ ] **Booking Lifecycle Hardening**: Finalize robust status transitions + edge-case reconciliation.
+- [x] **Booking Lifecycle Hardening (Core)**: Introduced operational statuses (`checked_in`) and owner operational actions (check-in/cancel/delete).
+- [ ] **Booking Lifecycle Hardening (Final)**: Add explicit `in_progress` transition and consistent Queue TV/Ticket behavior per status.
 - [ ] **Hard Transaction Locking**: Move critical conflict validation into Firestore transaction/cloud function for race-condition proofing.

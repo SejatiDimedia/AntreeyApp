@@ -136,7 +136,11 @@ export const BookingRepository = {
   async updateBookingStatus(businessId, bookingId, status) {
     try {
       const bookingRef = doc(db, `businesses/${businessId}/bookings`, bookingId);
-      await updateDoc(bookingRef, { status });
+      const payload = { status };
+      if (status === 'checked_in') payload.checkedInAt = new Date().toISOString();
+      if (status === 'in_progress') payload.startedAt = new Date().toISOString();
+      if (status === 'completed') payload.completedAt = new Date().toISOString();
+      await updateDoc(bookingRef, payload);
       return { success: true };
     } catch (error) {
       console.error('Error updating booking status:', error);
@@ -245,17 +249,22 @@ export const BookingRepository = {
     const q = query(
       collection(db, `businesses/${businessId}/bookings`),
       where('date', '==', dateStr),
-      where('status', '==', 'confirmed'),
       orderBy('queuePosition', 'asc')
     );
 
     return onSnapshot(q, (snapshot) => {
-      if (snapshot.empty) {
+      const active = snapshot.docs
+        .map((item) => ({ id: item.id, ...item.data() }))
+        .filter((item) => item.status !== 'cancelled' && item.status !== 'completed');
+      const nowServing = active.find((item) => item.status === 'in_progress')
+        || active.find((item) => item.status === 'confirmed')
+        || active.find((item) => item.status === 'checked_in')
+        || null;
+      if (!nowServing) {
         callback(null);
         return;
       }
-      const first = snapshot.docs[0];
-      callback({ id: first.id, ...first.data() });
+      callback(nowServing);
     }, (error) => {
       console.error('Error listening now serving:', error);
       callback(null);

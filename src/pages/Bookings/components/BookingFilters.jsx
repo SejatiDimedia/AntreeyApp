@@ -39,7 +39,9 @@ export const BookingFilters = ({
         >
           <option value="all">All Status</option>
           <option value="pending">Pending</option>
+          <option value="checked_in">Checked-in</option>
           <option value="confirmed">Confirmed</option>
+          <option value="in_progress">In Progress</option>
           <option value="completed">Completed</option>
           <option value="cancelled">Cancelled</option>
         </select>

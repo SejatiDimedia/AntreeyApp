@@ -108,6 +108,24 @@ export const BookingsPage = () => {
       console.error('Error calling next:', error);
     }
   };
+  const handleStartService = async (bookingId) => {
+    if (!activeBusiness?.id) return;
+    try {
+      await BookingRepository.updateBookingStatus(activeBusiness.id, bookingId, 'in_progress');
+      toast.success('Service started.');
+    } catch (error) {
+      toast.error('Failed to start service.');
+    }
+  };
+  const handleCompleteBooking = async (bookingId) => {
+    if (!activeBusiness?.id) return;
+    try {
+      await BookingRepository.updateBookingStatus(activeBusiness.id, bookingId, 'completed');
+      toast.success('Booking completed.');
+    } catch (error) {
+      toast.error('Failed to complete booking.');
+    }
+  };
 
   const openConfirm = (bookingId, action) => {
     if (action === 'cancel') {
@@ -342,10 +360,12 @@ export const BookingsPage = () => {
       {/* Bento Booking Table */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-card-gap">
         <div className="xl:col-span-9 glass-card rounded-3xl overflow-hidden flex flex-col">
-          <BookingTable
-            bookings={filteredBookings}
-            onCallNext={handleCallNext}
-            onCancelBooking={(id) => openConfirm(id, 'cancel')}
+        <BookingTable
+          bookings={filteredBookings}
+          onCallNext={handleCallNext}
+          onStartService={handleStartService}
+          onCompleteBooking={handleCompleteBooking}
+          onCancelBooking={(id) => openConfirm(id, 'cancel')}
             onDeleteBooking={(id) => openConfirm(id, 'delete')}
             onOpenTv={() => navigate('/queue-tv')}
             onCreateWalkIn={handleOpenWalkInModal}

@@ -51,7 +51,8 @@ export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) 
 
   const currentQueue = Number(booking?.queuePosition || 0);
   const nowServingQueue = Number(nowServing?.queuePosition || 0);
-  const aheadCount = booking?.status === 'confirmed'
+  const isServing = booking?.status === 'confirmed' || booking?.status === 'in_progress';
+  const aheadCount = isServing
     ? 0
     : Math.max(0, currentQueue - (nowServingQueue || 1));
   const avgDuration = (() => {
@@ -61,8 +62,8 @@ export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) 
     if (durations.length === 0) return 30;
     return Math.round(durations.reduce((sum, v) => sum + v, 0) / durations.length);
   })();
-  const estWaitMinutes = booking?.status === 'confirmed' ? 0 : aheadCount * avgDuration;
-  const estWaitLabel = booking?.status === 'confirmed'
+  const estWaitMinutes = isServing ? 0 : aheadCount * avgDuration;
+  const estWaitLabel = isServing
     ? 'NOW'
     : estWaitMinutes <= 0
       ? '<1m'
@@ -102,9 +103,9 @@ export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) 
             <div className="absolute -bottom-4 -left-4 w-8 h-8 bg-primary rounded-full"></div>
             <div className="absolute -bottom-4 -right-4 w-8 h-8 bg-primary rounded-full"></div>
             
-            <div className={`px-4 py-1.5 rounded-full font-label-md text-[12px] flex items-center gap-1 mb-6 ${booking?.status === 'confirmed' ? 'bg-primary text-white' : 'bg-tertiary-container/30 text-tertiary animate-pulse'}`}>
-              <span className={`w-2 h-2 rounded-full ${booking?.status === 'confirmed' ? 'bg-white' : 'bg-tertiary'}`}></span>
-              {booking?.status === 'confirmed' ? "It's your turn!" : "Queue is Moving"}
+            <div className={`px-4 py-1.5 rounded-full font-label-md text-[12px] flex items-center gap-1 mb-6 ${isServing ? 'bg-primary text-white' : 'bg-tertiary-container/30 text-tertiary animate-pulse'}`}>
+              <span className={`w-2 h-2 rounded-full ${isServing ? 'bg-white' : 'bg-tertiary'}`}></span>
+              {booking?.status === 'in_progress' ? 'Now being served' : isServing ? "It's your turn!" : 'Queue is Moving'}
             </div>
 
             <p className="text-on-surface-variant text-[14px] uppercase tracking-wider mb-2">Your Queue Number</p>

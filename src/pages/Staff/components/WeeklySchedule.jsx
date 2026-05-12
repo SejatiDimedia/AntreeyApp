@@ -1,193 +1,190 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-export const WeeklySchedule = () => {
+const DEFAULT_TIME_SLOTS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+
+const toDateKey = (dateObj) => {
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+const getWeekStart = (date = new Date()) => {
+  const copy = new Date(date);
+  const day = copy.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  copy.setDate(copy.getDate() + diff);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+};
+
+const getWeekDays = (anchor = new Date()) => {
+  const start = getWeekStart(anchor);
+  return Array.from({ length: 7 }).map((_, index) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + index);
+    return {
+      key: toDateKey(d),
+      label: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      day: d.getDate(),
+      month: d.toLocaleDateString('en-US', { month: 'short' })
+    };
+  });
+};
+
+const toMinutes = (hhmm) => {
+  if (!hhmm || typeof hhmm !== 'string' || !hhmm.includes(':')) return null;
+  const [h, m] = hhmm.split(':').map((v) => Number(v));
+  if (Number.isNaN(h) || Number.isNaN(m)) return null;
+  return (h * 60) + m;
+};
+
+const toHHMM = (minutes) => {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
+
+export const WeeklySchedule = ({ staff = [], bookings = [] }) => {
+  const weekDays = useMemo(() => getWeekDays(new Date()), []);
+  const timeSlots = useMemo(() => {
+    if (!staff.length) return DEFAULT_TIME_SLOTS;
+    const starts = staff
+      .map((member) => toMinutes(member?.availability?.startTime || '09:00'))
+      .filter((v) => Number.isFinite(v));
+    const ends = staff
+      .map((member) => toMinutes(member?.availability?.endTime || '17:00'))
+      .filter((v) => Number.isFinite(v));
+    if (!starts.length || !ends.length) return DEFAULT_TIME_SLOTS;
+    const minStart = Math.min(...starts);
+    const maxEnd = Math.max(...ends);
+    if (maxEnd <= minStart) return DEFAULT_TIME_SLOTS;
+    const slots = [];
+    for (let cur = minStart; cur <= maxEnd; cur += 60) {
+      slots.push(toHHMM(cur));
+    }
+    return slots.length ? slots : DEFAULT_TIME_SLOTS;
+  }, [staff]);
+
+  const bookingMap = useMemo(() => {
+    const map = new Map();
+    bookings
+      .filter((item) => item.status !== 'cancelled')
+      .forEach((item) => {
+        const key = `${item.date}|${item.timeSlot}`;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(item);
+      });
+    return map;
+  }, [bookings]);
+
+  const weekBookings = useMemo(() => {
+    const keySet = new Set(weekDays.map((day) => day.key));
+    return bookings.filter((item) => keySet.has(item.date) && item.status !== 'cancelled');
+  }, [bookings, weekDays]);
+  const activeStatuses = new Set(['pending', 'checked_in', 'confirmed', 'in_progress']);
+  const visibleWeekBookingCount = useMemo(() => {
+    const keySet = new Set(weekDays.map((day) => day.key));
+    const slotSet = new Set(timeSlots);
+    return bookings.filter((item) => {
+      if (!keySet.has(item.date)) return false;
+      if (!slotSet.has(item.timeSlot)) return false;
+      return activeStatuses.has(String(item.status || '').toLowerCase());
+    }).length;
+  }, [bookings, weekDays, timeSlots]);
+
+  const rangeText = `${weekDays[0].month} ${weekDays[0].day} - ${weekDays[6].month} ${weekDays[6].day}`;
+
+  const getAvailabilityCount = (dayKey, time) => {
+    return staff.filter((member) => {
+      const start = toMinutes(member?.availability?.startTime || '09:00');
+      const end = toMinutes(member?.availability?.endTime || '17:00');
+      const slot = toMinutes(time);
+      const dayIdx = new Date(`${dayKey}T00:00:00`).getDay();
+      const workingDays = Array.isArray(member?.availability?.workingDays) ? member.availability.workingDays : [1, 2, 3, 4, 5, 6];
+      if (!workingDays.includes(dayIdx)) return false;
+      if (slot == null || start == null || end == null) return true;
+      return slot >= start && slot <= end;
+    }).length;
+  };
+
   return (
-    <div className="bg-white/80 backdrop-blur-xl shadow-[0_20px_40px_0_rgba(0,0,0,0.1)] rounded-[40px] p-container-padding h-full flex flex-col">
-      <div className="flex items-center justify-between mb-8">
+    <section className="rounded-[28px] border border-outline-variant/30 bg-white shadow-[0_16px_30px_rgba(0,0,0,0.06)] p-6 md:p-7">
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6">
         <div>
-          <h2 className="font-headline-lg-mobile text-headline-lg-mobile">Weekly Schedule</h2>
-          <p className="font-label-sm text-label-sm text-on-surface-variant">October 12 - October 18, 2025</p>
+          <p className="text-xs uppercase tracking-[0.14em] text-on-surface-variant">Operations</p>
+          <h2 className="text-[26px] leading-tight font-semibold text-on-surface">Weekly Schedule</h2>
+          <p className="text-sm text-on-surface-variant mt-1">{rangeText}</p>
         </div>
-        <div className="flex bg-surface-container rounded-full p-1">
-          <button className="px-6 py-2 rounded-full bg-white shadow-sm font-label-md text-label-md">Week</button>
-          <button className="px-6 py-2 rounded-full text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Month</button>
-        </div>
-      </div>
-
-      {/* Schedule Table */}
-      <div className="flex-grow overflow-x-auto scrollbar-hide">
-        <div className="min-w-[800px]">
-          {/* Table Header (Days) */}
-          <div className="grid grid-cols-8 gap-4 border-b border-outline-variant pb-4 mb-4">
-            <div className="col-span-1"></div> {/* Spacer for time column */}
-            
-            <div className="text-center">
-              <div className="text-label-sm text-on-surface-variant uppercase font-bold tracking-tighter">Mon</div>
-              <div className="text-headline-lg-mobile font-bold">12</div>
-            </div>
-            <div className="text-center">
-              <div className="text-label-sm text-on-surface-variant uppercase font-bold tracking-tighter">Tue</div>
-              <div className="text-headline-lg-mobile font-bold">13</div>
-            </div>
-            <div className="text-center">
-              <div className="text-label-sm text-on-surface-variant uppercase font-bold tracking-tighter">Wed</div>
-              <div className="text-headline-lg-mobile font-bold">14</div>
-            </div>
-            <div className="text-center bg-primary text-on-primary rounded-2xl py-1 shadow-md shadow-primary/20">
-              <div className="text-label-sm uppercase font-bold tracking-tighter opacity-70">Thu</div>
-              <div className="text-headline-lg-mobile font-bold">15</div>
-            </div>
-            <div className="text-center">
-              <div className="text-label-sm text-on-surface-variant uppercase font-bold tracking-tighter">Fri</div>
-              <div className="text-headline-lg-mobile font-bold">16</div>
-            </div>
-            <div className="text-center">
-              <div className="text-label-sm text-on-surface-variant uppercase font-bold tracking-tighter">Sat</div>
-              <div className="text-headline-lg-mobile font-bold">17</div>
-            </div>
-            <div className="text-center">
-              <div className="text-label-sm text-on-surface-variant uppercase font-bold tracking-tighter">Sun</div>
-              <div className="text-headline-lg-mobile font-bold">18</div>
-            </div>
+        <div className="grid grid-cols-2 gap-3 w-full md:w-auto">
+          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-low px-4 py-3 min-w-[150px]">
+            <p className="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">Bookings</p>
+            <p className="text-xl font-semibold text-on-surface">{visibleWeekBookingCount}</p>
           </div>
-
-          {/* Time Slots */}
-          <div className="space-y-4">
-            {/* 09:00 Slot */}
-            <div className="grid grid-cols-8 gap-4 items-center">
-              <div className="text-label-sm text-on-surface-variant font-bold">09:00</div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Widodo</span>
-                <div className="flex -space-x-2">
-                  <div className="w-4 h-4 rounded-full bg-primary border border-white"></div>
-                </div>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Linus</span>
-              </div>
-              
-              <div className="bg-inverse-surface text-inverse-on-surface rounded-xl p-2 h-16 flex flex-col justify-center items-center hover:opacity-90 cursor-pointer transition-opacity">
-                <span className="text-[10px] font-bold uppercase opacity-50">Meeting</span>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Widodo</span>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-            </div>
-
-            {/* 11:00 Slot */}
-            <div className="grid grid-cols-8 gap-4 items-center">
-              <div className="text-label-sm text-on-surface-variant font-bold">11:00</div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between col-span-2 hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Darent - Masterclass</span>
-              </div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Linus</span>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Widodo</span>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-            </div>
-
-            {/* 14:00 Slot (Highlighted in Mockup style) */}
-            <div className="grid grid-cols-8 gap-4 items-center">
-              <div className="text-label-sm text-on-surface-variant font-bold">14:00</div>
-              
-              <div className="bg-primary-fixed rounded-xl p-2 h-20 flex flex-col justify-between shadow-sm border border-primary/20 cursor-pointer hover:shadow-md transition-shadow">
-                <span className="text-[10px] font-extrabold text-on-primary-fixed uppercase tracking-wider">Busy</span>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold">Widodo</span>
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                </div>
-              </div>
-              
-              <div className="bg-primary-fixed rounded-xl p-2 h-20 flex flex-col justify-between shadow-sm border border-primary/20 cursor-pointer hover:shadow-md transition-shadow">
-                <span className="text-[10px] font-extrabold text-on-primary-fixed uppercase tracking-wider">Busy</span>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold">Darent</span>
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                </div>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-20 border border-dashed border-outline-variant/30"></div>
-              <div className="bg-surface-container-low rounded-xl h-20 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-fixed rounded-xl p-2 h-20 flex flex-col justify-between shadow-sm border border-primary/20 cursor-pointer hover:shadow-md transition-shadow">
-                <span className="text-[10px] font-extrabold text-on-primary-fixed uppercase tracking-wider">Busy</span>
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold">Linus</span>
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-                </div>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-20 border border-dashed border-outline-variant/30"></div>
-              <div className="bg-surface-container-low rounded-xl h-20 border border-dashed border-outline-variant/30"></div>
-            </div>
-
-            {/* 16:00 Slot */}
-            <div className="grid grid-cols-8 gap-4 items-center">
-              <div className="text-label-sm text-on-surface-variant font-bold">16:00</div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Darent</span>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-primary-container/20 border border-primary/10 rounded-xl p-2 h-16 flex flex-col justify-between hover:bg-primary-container/30 cursor-pointer transition-colors">
-                <span className="text-[10px] font-bold text-primary uppercase truncate">Linus</span>
-              </div>
-              
-              <div className="bg-surface-container-low rounded-xl h-16 border border-dashed border-outline-variant/30"></div>
-              
-              <div className="bg-error-container text-on-error-container rounded-xl p-2 h-16 flex flex-col justify-center items-center border border-error/20">
-                <span className="text-[10px] font-bold uppercase">Off</span>
-              </div>
-            </div>
+          <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-low px-4 py-3 min-w-[150px]">
+            <p className="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">Staff</p>
+            <p className="text-xl font-semibold text-on-surface">{staff.length}</p>
           </div>
         </div>
       </div>
 
-      {/* Footer Legend & Actions */}
-      <div className="mt-8 pt-6 border-t border-outline-variant/50 flex items-center justify-between">
-        <div className="flex gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-primary-fixed"></div>
-            <span className="text-[12px] text-on-surface-variant">Occupied</span>
+      <div className="overflow-x-auto">
+        <div className="min-w-[980px]">
+          <div className="grid grid-cols-8 gap-2 mb-3">
+            <div></div>
+            {weekDays.map((day) => (
+              <div key={day.key} className="rounded-xl border border-outline-variant/20 bg-surface-container-low px-3 py-3 text-center">
+                <p className="text-[11px] uppercase tracking-[0.08em] text-on-surface-variant">{day.label}</p>
+                <p className="text-lg font-semibold text-on-surface">{day.day}</p>
+              </div>
+            ))}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-primary-container/20 border border-primary/30"></div>
-            <span className="text-[12px] text-on-surface-variant">Available</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-inverse-surface"></div>
-            <span className="text-[12px] text-on-surface-variant">Internal</span>
+
+          <div className="space-y-2">
+            {timeSlots.map((time) => (
+              <div key={time} className="grid grid-cols-8 gap-2">
+                <div className="h-[54px] rounded-xl border border-outline-variant/20 bg-surface-container-low flex items-center justify-center text-xs font-semibold text-on-surface-variant">
+                  {time}
+                </div>
+                {weekDays.map((day) => {
+                  const key = `${day.key}|${time}`;
+                  const items = (bookingMap.get(key) || []).filter((item) => item.status !== 'completed');
+                  const availabilityCount = getAvailabilityCount(day.key, time);
+
+                  if (items.length > 0) {
+                    return (
+                      <div key={key} className="h-[54px] rounded-xl border border-primary/30 bg-primary-container/55 px-3 py-2 flex flex-col justify-center">
+                        <p className="text-[10px] uppercase tracking-[0.07em] text-primary font-semibold">Booked</p>
+                        <p className="text-[12px] font-semibold text-on-surface truncate">{items[0].customerName || items[0].serviceName || 'Reserved'}</p>
+                      </div>
+                    );
+                  }
+
+                  if (availabilityCount > 0) {
+                    return (
+                      <div key={key} className="h-[54px] rounded-xl border border-outline-variant/20 bg-white px-3 py-2 flex items-center justify-center">
+                        <p className="text-[11px] text-on-surface-variant">{availabilityCount} available</p>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={key} className="h-[54px] rounded-xl border border-error/25 bg-error-container/40 px-3 py-2 flex items-center justify-center">
+                      <p className="text-[11px] font-medium text-on-error-container">Off</p>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
           </div>
         </div>
-        <button className="bg-surface-container-highest px-4 py-2 rounded-xl text-label-md hover:bg-surface-container-highest/80 transition-colors">
-          Download PDF
-        </button>
       </div>
-    </div>
+
+      <div className="mt-6 pt-4 border-t border-outline-variant/25 flex flex-wrap gap-4 text-xs text-on-surface-variant">
+        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-primary"></span>Booked</div>
+        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-surface-container-high border border-outline-variant/30"></span>Available</div>
+        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-error-container border border-error/35"></span>Off</div>
+      </div>
+    </section>
   );
 };

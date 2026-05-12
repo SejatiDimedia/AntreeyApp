@@ -61,6 +61,18 @@ const getServiceTimeSlots = (service) => {
   );
   return slotsFromWindow.length > 0 ? slotsFromWindow : defaultTimeSlots;
 };
+const isStaffAvailableAt = (staff, dateStr, timeSlot) => {
+  if (!staff) return false;
+  const availability = staff.availability || {};
+  const workingDays = Array.isArray(availability.workingDays) ? availability.workingDays : [0, 1, 2, 3, 4, 5, 6];
+  const dayIdx = new Date(`${dateStr}T00:00:00`).getDay();
+  if (!workingDays.includes(dayIdx)) return false;
+  const start = toMinutes(availability.startTime || '00:00');
+  const end = toMinutes(availability.endTime || '23:59');
+  const slot = toMinutes(timeSlot);
+  if (start == null || end == null || slot == null) return true;
+  return slot >= start && slot <= end;
+};
 
 export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
   const { currentUser, userProfile } = useAuth();
@@ -133,6 +145,7 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
       ) && isOverlapping(slotStart, slotEnd, bStart, bEnd);
     });
   };
+  const availableStaffList = staffList.filter((member) => isStaffAvailableAt(member, selectedDate, selectedTime || '00:00'));
 
   useEffect(() => {
     async function fetchStaff() {
@@ -163,6 +176,12 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
 
     return unsubscribe;
   }, [businessId, selectedDate, service?.durationMinutes, service?.duration]);
+
+  useEffect(() => {
+    if (!selectedStaff) return;
+    const stillAvailable = isStaffAvailableAt(selectedStaff, selectedDate, selectedTime || '00:00');
+    if (!stillAvailable) setSelectedStaff(null);
+  }, [selectedDate, selectedTime, selectedStaff]);
 
   const handleConfirm = async () => {
     if (!selectedTime || !businessId || !service?.id || !currentUser?.uid) return;
@@ -310,9 +329,9 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
               {selectedStaff === null && <span className="material-symbols-outlined text-primary">check_circle</span>}
             </div>
 
-            {staffList.length === 0 && <p className="text-[12px] text-on-surface-variant ml-2">No specific staff members listed</p>}
+            {availableStaffList.length === 0 && <p className="text-[12px] text-on-surface-variant ml-2">No available staff in selected date/time</p>}
 
-            {staffList.map(staff => (
+            {availableStaffList.map(staff => (
               <div 
                 key={staff.id}
                 onClick={() => setSelectedStaff(staff)}
