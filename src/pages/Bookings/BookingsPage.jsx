@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookingFilters } from './components/BookingFilters';
 import { BookingTable } from './components/BookingTable';
@@ -26,8 +26,18 @@ export const BookingsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(getTodayDateKey());
   const [monthAnchor, setMonthAnchor] = useState(new Date());
+  const [selectedServiceId, setSelectedServiceId] = useState('all');
+  const [selectedStatus, setSelectedStatus] = useState('all');
   const [walkInModalOpen, setWalkInModalOpen] = useState(false);
   const [walkInSubmitting, setWalkInSubmitting] = useState(false);
+  const [checkInModalOpen, setCheckInModalOpen] = useState(false);
+  const [checkInCode, setCheckInCode] = useState('');
+  const [checkInSubmitting, setCheckInSubmitting] = useState(false);
+  const [scannerActive, setScannerActive] = useState(false);
+  const [scannerSupported, setScannerSupported] = useState(true);
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
+  const scanIntervalRef = useRef(null);
   const [services, setServices] = useState([]);
   const [walkInForm, setWalkInForm] = useState({
     customerName: '',
@@ -35,6 +45,13 @@ export const BookingsPage = () => {
     date: getTodayDateKey(),
     timeSlot: '',
     durationMinutes: '30'
+  });
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    bookingId: '',
+    action: '', // cancel | delete
+    title: '',
+    message: ''
   });
 
   const getCurrentRoundedTime = () => {
@@ -92,6 +109,58 @@ export const BookingsPage = () => {
     }
   };
 
+  const openConfirm = (bookingId, action) => {
+    if (action === 'cancel') {
+      setConfirmDialog({
+        open: true,
+        bookingId,
+        action,
+        title: 'Cancel Booking?',
+        message: 'Booking akan diubah ke status cancelled. Aksi ini bisa mempengaruhi antrian aktif.'
+      });
+      return;
+    }
+    setConfirmDialog({
+      open: true,
+      bookingId,
+      action,
+      title: 'Delete Booking Permanently?',
+      message: 'Data booking akan dihapus permanen dan tidak bisa dikembalikan.'
+    });
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!activeBusiness?.id) return;
+    try {
+      await BookingRepository.updateBookingStatus(activeBusiness.id, bookingId, 'cancelled');
+      toast.success('Booking cancelled.');
+    } catch (error) {
+      console.error('Cancel booking failed:', error);
+      toast.error('Failed to cancel booking.');
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId) => {
+    if (!activeBusiness?.id) return;
+    try {
+      await BookingRepository.deleteBooking(activeBusiness.id, bookingId);
+      toast.success('Booking deleted.');
+    } catch (error) {
+      console.error('Delete booking failed:', error);
+      toast.error('Failed to delete booking.');
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmDialog.bookingId || !confirmDialog.action) return;
+    if (confirmDialog.action === 'cancel') {
+      await handleCancelBooking(confirmDialog.bookingId);
+    } else if (confirmDialog.action === 'delete') {
+      await handleDeleteBooking(confirmDialog.bookingId);
+    }
+    setConfirmDialog({ open: false, bookingId: '', action: '', title: '', message: '' });
+  };
+
   const handleOpenWalkInModal = () => {
     const firstService = services[0];
     setWalkInForm({
@@ -144,6 +213,81 @@ export const BookingsPage = () => {
     }
   };
 
+  const handleCheckInByCode = async () => {
+    if (!activeBusiness?.id) return;
+    const code = checkInCode.trim();
+    if (!code) {
+      toast.error('Masukkan kode booking dulu.');
+      return;
+    }
+    setCheckInSubmitting(true);
+    try {
+      await BookingRepository.checkInByCode(activeBusiness.id, selectedDate, code);
+      toast.success('Customer berhasil check-in.');
+      setCheckInModalOpen(false);
+      setCheckInCode('');
+    } catch (error) {
+      if (error?.code === 'booking/not-found') {
+        toast.error('Kode booking tidak ditemukan untuk tanggal ini.');
+      } else {
+        toast.error('Gagal check-in. Coba lagi.');
+      }
+    } finally {
+      setCheckInSubmitting(false);
+    }
+  };
+
+  const stopScanner = () => {
+    if (scanIntervalRef.current) {
+      clearInterval(scanIntervalRef.current);
+      scanIntervalRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setScannerActive(false);
+  };
+
+  const startScanner = async () => {
+    try {
+      const hasBarcodeDetector = typeof window !== 'undefined' && 'BarcodeDetector' in window;
+      if (!hasBarcodeDetector) {
+        setScannerSupported(false);
+        toast.error('Scanner tidak didukung browser ini. Gunakan input kode manual.');
+        return;
+      }
+      const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+      setScannerActive(true);
+      scanIntervalRef.current = setInterval(async () => {
+        if (!videoRef.current) return;
+        try {
+          const codes = await detector.detect(videoRef.current);
+          if (codes && codes.length > 0) {
+            const rawValue = String(codes[0].rawValue || '').trim();
+            if (!rawValue) return;
+            const parsed = rawValue.includes(':') ? rawValue.split(':').pop().trim() : rawValue;
+            setCheckInCode(parsed.slice(0, 8));
+            toast.success('Kode booking terdeteksi.');
+            stopScanner();
+          }
+        } catch {
+          // no-op scan frame failure
+        }
+      }, 700);
+    } catch (error) {
+      console.error('Start scanner failed:', error);
+      toast.error('Tidak bisa mengakses kamera.');
+      stopScanner();
+    }
+  };
+
   const bookingCountByDate = bookings.reduce((acc, item) => {
     const key = item.date;
     if (!key) return acc;
@@ -151,8 +295,15 @@ export const BookingsPage = () => {
     return acc;
   }, {});
 
+  const serviceOptions = services.map((item) => ({
+    id: item.id,
+    name: item.title || item.name || 'Service'
+  }));
+
   const filteredBookings = bookings
     .filter((item) => item.date === selectedDate)
+    .filter((item) => (selectedServiceId === 'all' ? true : item.serviceId === selectedServiceId))
+    .filter((item) => (selectedStatus === 'all' ? true : String(item.status || '').toLowerCase() === selectedStatus))
     .sort((a, b) => {
       const aQueue = Number(a.queuePosition || 0);
       const bQueue = Number(b.queuePosition || 0);
@@ -179,16 +330,30 @@ export const BookingsPage = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <BookingFilters />
+      <BookingFilters
+        serviceOptions={serviceOptions}
+        selectedServiceId={selectedServiceId}
+        onServiceChange={setSelectedServiceId}
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
+        selectedDate={selectedDate}
+      />
       
       {/* Bento Booking Table */}
-      <div className="grid grid-cols-12 gap-card-gap">
-        <div className="col-span-12 lg:col-span-9 glass-card rounded-3xl overflow-hidden flex flex-col">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-card-gap">
+        <div className="xl:col-span-9 glass-card rounded-3xl overflow-hidden flex flex-col">
           <BookingTable
             bookings={filteredBookings}
             onCallNext={handleCallNext}
+            onCancelBooking={(id) => openConfirm(id, 'cancel')}
+            onDeleteBooking={(id) => openConfirm(id, 'delete')}
             onOpenTv={() => navigate('/queue-tv')}
             onCreateWalkIn={handleOpenWalkInModal}
+            onOpenCheckIn={() => {
+              setCheckInCode('');
+              setScannerSupported(true);
+              setCheckInModalOpen(true);
+            }}
             queueConfig={{
               prefix: activeBusiness?.queuePrefix || 'A',
               padLength: Number(activeBusiness?.queuePadLength || 1)
@@ -197,7 +362,7 @@ export const BookingsPage = () => {
         </div>
         
         {/* Sidebar Calendar & Stats (Bento Style) */}
-        <div className="col-span-12 lg:col-span-3 flex flex-col gap-card-gap">
+        <div className="xl:col-span-3 flex flex-col gap-4 sm:gap-card-gap">
           <CalendarCard
             selectedDate={selectedDate}
             onSelectDate={setSelectedDate}
@@ -292,6 +457,108 @@ export const BookingsPage = () => {
                 className="px-5 py-2.5 rounded-xl bg-primary text-white font-semibold"
               >
                 {walkInSubmitting ? 'Saving...' : 'Create Walk-in'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {checkInModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={() => {
+            if (!checkInSubmitting) {
+              stopScanner();
+              setCheckInModalOpen(false);
+            }
+          }} />
+          <div className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl border border-outline-variant/20 overflow-hidden">
+            <div className="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between bg-secondary-container/30">
+              <div>
+                <h3 className="font-headline-lg-mobile text-[22px] text-on-surface">Check-in Booking</h3>
+                <p className="text-sm text-on-surface-variant">Input kode tiket dari customer (contoh: 8 karakter awal ID).</p>
+              </div>
+              <button
+                onClick={() => !checkInSubmitting && setCheckInModalOpen(false)}
+                className="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-surface-container-low rounded-xl px-4 py-3 text-sm text-on-surface-variant">
+                Active date: <span className="font-semibold text-on-surface">{selectedDate}</span>
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-on-surface mb-1 block">Booking Code</label>
+                <input
+                  className="w-full p-3 rounded-xl border border-outline-variant/30 bg-surface-container-low uppercase tracking-widest"
+                  value={checkInCode}
+                  onChange={(e) => setCheckInCode(e.target.value)}
+                  placeholder="e.g. 3fa9bc12"
+                />
+              </div>
+              <div className="rounded-xl border border-outline-variant/30 bg-surface-container-low p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-semibold text-on-surface">QR Scanner</p>
+                  {!scannerActive ? (
+                    <button onClick={startScanner} type="button" className="text-xs px-3 py-1.5 rounded-lg bg-primary text-white">Start Scan</button>
+                  ) : (
+                    <button onClick={stopScanner} type="button" className="text-xs px-3 py-1.5 rounded-lg bg-error text-white">Stop</button>
+                  )}
+                </div>
+                <div className="w-full aspect-video rounded-lg overflow-hidden bg-black/70 flex items-center justify-center">
+                  <video ref={videoRef} className={`w-full h-full object-cover ${scannerActive ? 'block' : 'hidden'}`} muted playsInline />
+                  {!scannerActive && (
+                    <p className="text-xs text-white/80 px-4 text-center">
+                      {scannerSupported ? 'Klik Start Scan untuk buka kamera.' : 'Scanner tidak didukung di browser ini.'}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="px-6 pb-6 pt-2 flex items-center justify-end gap-3">
+              <button
+                onClick={() => {
+                  stopScanner();
+                  setCheckInModalOpen(false);
+                }}
+                disabled={checkInSubmitting}
+                className="px-5 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCheckInByCode}
+                disabled={checkInSubmitting}
+                className="px-5 py-2.5 rounded-xl bg-secondary text-white font-semibold"
+              >
+                {checkInSubmitting ? 'Checking...' : 'Check-in'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDialog.open && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/45" onClick={() => setConfirmDialog({ open: false, bookingId: '', action: '', title: '', message: '' })} />
+          <div className="relative w-full max-w-md bg-white rounded-3xl border border-outline-variant/20 shadow-2xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-outline-variant/20">
+              <h3 className="text-[20px] font-bold text-on-surface">{confirmDialog.title}</h3>
+              <p className="text-sm text-on-surface-variant mt-1">{confirmDialog.message}</p>
+            </div>
+            <div className="px-6 py-5 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setConfirmDialog({ open: false, bookingId: '', action: '', title: '', message: '' })}
+                className="px-4 py-2 rounded-xl border border-outline-variant/30 text-on-surface"
+              >
+                Keep Booking
+              </button>
+              <button
+                onClick={handleConfirmAction}
+                className={`px-4 py-2 rounded-xl text-white font-semibold ${confirmDialog.action === 'delete' ? 'bg-error' : 'bg-tertiary'}`}
+              >
+                {confirmDialog.action === 'delete' ? 'Yes, Delete' : 'Yes, Cancel'}
               </button>
             </div>
           </div>

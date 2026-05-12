@@ -1,8 +1,8 @@
 # Antreey Project Status & Roadmap
 
-Document updated: 2026-05-10
+Document updated: 2026-05-12
 
-## 📊 Overall Progress: 91%
+## 📊 Overall Progress: 95%
 Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now moving into the final logic integration and AI enhancement phases.
 
 ---
@@ -70,13 +70,18 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Service Analytics Wiring**: Service Distribution now reads booking/service metrics from Firestore (with empty-state handling when data is not available).
 - [x] **Business Settings Wiring**: Business Profile form now loads/saves real Firestore business data for the active business.
 - [x] **Resources UX Hardening**: Full-screen modal backdrop fix, edit/delete confirmation, and created-at ordering.
+- [x] **Queue Number Customization**: Business can configure queue prefix and digit length in Settings (e.g., `BRB-001`).
+- [x] **Queue TV Enhancement**: Added Global / Per Service mode switch with service-lane now-serving + waiting list.
+- [x] **Owner Calendar Integration**: Booking table now syncs with selected calendar date and calendar shows booking count badges per day.
+- [x] **Walk-in Booking UI**: Added owner modal for walk-in creation (service/date/start time/duration) with Sonner feedback.
+- [x] **My Bookings + Ticket Consistency**: Customer can open ticket detail from my bookings with the same ticket-style UI flow.
 
 ### Phase 8.5: Role-Based Access Control (RBAC) (IN PROGRESS)
 - [x] **Role Definition**: Implement `role` logic in `AuthContext` (Owner, Staff, Customer).
 - [x] **Protected Routes**: Restrict access to admin pages based on user roles.
 - [x] **UI Conditional Rendering**: Show/hide menu items based on the active user's permissions.
 - [x] **Firestore Rules Baseline Fix**: Resolved auth/domain/firestore database target issues and aligned rules deployment to the active Firestore database ID.
-- [ ] **Firestore Rules Refinement**: Final hardening for all new membership flows (`businesses/*/customers/*`) and least-privilege enforcement.
+- [x] **Firestore Rules Refinement**: Membership-based access for customer app and owner scope stabilized (`businesses/*/customers/*`, services/resources visibility flow).
 
 ### Phase 9: AI Integration (Gemini 2.5 Flash)
 - [ ] **AI Slot Recommendation**: Analyze historical data to suggest the best booking time.
@@ -92,8 +97,9 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 
 ## ▶️ Next Execution Focus
 
-### Phase 8.6: Booking Engine v2 (NEXT)
-- [ ] **Resource-aware Availability**: Prevent overlapping bookings on mapped resources.
-- [ ] **Slot Generation from Real Availability**: Customer app should only show bookable slots.
-- [ ] **Atomic Booking Validation on Submit**: Re-check conflicts at write-time to prevent race conditions.
-- [ ] **Booking Lifecycle Hardening**: Ensure robust status transitions and realtime UI sync.
+### Phase 8.6: Booking Engine v2 (IN PROGRESS)
+- [x] **Resource-aware Availability**: Overlap prevention now checks service/resource/staff constraints and time range.
+- [x] **Slot Generation from Real Availability**: Customer app disables slots using realtime overlap checks (including walk-in ranges).
+- [x] **Atomic Booking Validation on Submit**: Conflict re-check enforced at submit in repository before write.
+- [ ] **Booking Lifecycle Hardening**: Finalize robust status transitions + edge-case reconciliation.
+- [ ] **Hard Transaction Locking**: Move critical conflict validation into Firestore transaction/cloud function for race-condition proofing.

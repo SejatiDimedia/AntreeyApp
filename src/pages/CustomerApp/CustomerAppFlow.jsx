@@ -144,7 +144,7 @@ export const CustomerAppFlow = () => {
   return (
     <div className="min-h-screen bg-surface-container-high md:p-6 lg:p-10">
       <div className="mx-auto w-full md:max-w-[430px] min-h-screen md:min-h-[calc(100vh-3rem)] bg-surface-bright md:rounded-[28px] md:shadow-xl md:overflow-hidden relative">
-        {currentUser && (
+        {currentUser && step !== 'ticket' && (
           <button
             onClick={async () => {
               await logout();

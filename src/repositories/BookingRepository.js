@@ -8,7 +8,8 @@ import {
   query, 
   where, 
   onSnapshot,
-  orderBy
+  orderBy,
+  deleteDoc
 } from 'firebase/firestore';
 
 const BOOKINGS_COLLECTION = 'bookings';
@@ -139,6 +140,46 @@ export const BookingRepository = {
       return { success: true };
     } catch (error) {
       console.error('Error updating booking status:', error);
+      throw error;
+    }
+  },
+  async deleteBooking(businessId, bookingId) {
+    try {
+      const bookingRef = doc(db, `businesses/${businessId}/bookings`, bookingId);
+      await deleteDoc(bookingRef);
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting booking:', error);
+      throw error;
+    }
+  },
+  async checkInByCode(businessId, dateStr, code) {
+    const normalizedCode = String(code || '').trim().toLowerCase();
+    if (!normalizedCode) {
+      const error = new Error('Code is required');
+      error.code = 'booking/invalid-code';
+      throw error;
+    }
+    try {
+      const q = query(
+        collection(db, `businesses/${businessId}/bookings`),
+        where('date', '==', dateStr)
+      );
+      const snapshot = await getDocs(q);
+      const match = snapshot.docs.find((item) => item.id.toLowerCase().startsWith(normalizedCode));
+      if (!match) {
+        const notFound = new Error('Booking code not found');
+        notFound.code = 'booking/not-found';
+        throw notFound;
+      }
+      const bookingRef = doc(db, `businesses/${businessId}/bookings`, match.id);
+      await updateDoc(bookingRef, {
+        status: 'checked_in',
+        checkedInAt: new Date().toISOString()
+      });
+      return { id: match.id, ...match.data(), status: 'checked_in' };
+    } catch (error) {
+      console.error('Error check-in by code:', error);
       throw error;
     }
   },

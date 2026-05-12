@@ -1,24 +1,48 @@
 import React from 'react';
 
-export const BookingFilters = () => {
+export const BookingFilters = ({
+  serviceOptions = [],
+  selectedServiceId = 'all',
+  onServiceChange,
+  selectedStatus = 'all',
+  onStatusChange,
+  selectedDate
+}) => {
+  const dateLabel = selectedDate
+    ? new Date(selectedDate).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })
+    : '-';
+
   return (
-    <div className="glass-card rounded-xl p-4 flex flex-wrap items-center justify-between gap-4">
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
-        <button className="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md transition-colors whitespace-nowrap">All Services</button>
-        <button className="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Haircut</button>
-        <button className="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Styling</button>
-        <button className="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Spa Treatments</button>
-        <button className="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Coloring</button>
+    <div className="glass-card rounded-xl p-3 sm:p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="text-xs sm:text-sm text-on-surface-variant">
+        Active date: <span className="font-semibold text-on-surface">{dateLabel}</span>
       </div>
-      
-      <div className="flex items-center gap-3">
-        <div className="bg-white/50 rounded-lg px-4 py-2 flex items-center gap-2 border border-outline-variant/30">
-          <span className="material-symbols-outlined text-[18px]">calendar_month</span>
-          <span className="font-label-md">12 Oct, 2025</span>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="flex items-center gap-2">
+          <select
+            className="w-full sm:w-auto px-3 sm:px-4 py-2 rounded-lg font-label-md border min-w-0 sm:min-w-[190px] text-sm"
+            value={selectedServiceId}
+            onChange={(e) => onServiceChange?.(e.target.value)}
+          >
+            <option value="all">All Services</option>
+            {serviceOptions.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
         </div>
-        <button className="bg-white/50 p-2 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary transition-colors">
-          <span className="material-symbols-outlined">filter_list</span>
-        </button>
+        <select
+          className="w-full sm:w-auto bg-white/50 p-2 rounded-lg border border-outline-variant/30 text-on-surface-variant text-sm"
+          value={selectedStatus}
+          onChange={(e) => onStatusChange?.(e.target.value)}
+        >
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
       </div>
     </div>
   );

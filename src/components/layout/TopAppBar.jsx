@@ -61,70 +61,79 @@ export const TopAppBar = ({ title, activeCount }) => {
 
   return (
     <>
-      <header className="flex items-center justify-between px-gutter w-full h-20 bg-transparent">
-        <div className="flex items-center gap-4">
-          <h1 className="font-headline-lg text-headline-lg text-on-surface">{title}</h1>
-          {showBusinessSwitcher && (
-            <select
-              className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-3 py-2 text-label-sm"
-              value={activeBusinessId}
-              onChange={(e) => selectBusiness(e.target.value)}
-            >
-              {businesses.map((business) => (
-                <option key={business.id} value={business.id}>
-                  {business.name || business.businessName || `Business ${business.id.slice(0, 6)}`}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {canCreateBusiness && (
-            <button onClick={openCreateBusiness} className="bg-secondary text-on-secondary px-4 py-2 rounded-xl font-label-sm flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">storefront</span>
-              Add Business
-            </button>
-          )}
-
-          {activeCount !== undefined && (
-            <div className="bg-primary-container/20 text-primary px-4 py-1.5 rounded-full font-label-md flex items-center gap-2">
-              <span className="w-2 h-2 bg-primary rounded-full"></span>
-              {activeCount} Active Today
+      <header className="w-full border-b border-outline-variant/20 px-4 sm:px-gutter py-3">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <h1 className="font-headline-lg text-xl sm:text-2xl text-on-surface">{title}</h1>
+              {activeCount !== undefined && (
+                <div className="bg-primary-container/20 text-primary px-3 py-1 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2">
+                  <span className="w-2 h-2 bg-primary rounded-full"></span>
+                  {activeCount} Active Today
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        <div className="flex items-center gap-4">
-          <div className="relative group hidden sm:block">
-            <span className="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
-              <span className="material-symbols-outlined text-[20px]">search</span>
-            </span>
-            <input
-              type="text"
-              placeholder="Search bookings..."
-              className="pl-10 pr-4 py-2 bg-surface-container-lowest border-none rounded-full w-64 focus:ring-2 focus:ring-primary transition-all font-body-md shadow-sm outline-none"
-            />
+            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+              <button className="p-2 hover:bg-surface-container-highest/50 rounded-full transition-all text-on-surface-variant">
+                <span className="material-symbols-outlined">notifications</span>
+              </button>
+
+              <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-outline-variant/30">
+                <div className="text-right hidden md:block">
+                  <p className="text-label-md text-on-surface font-semibold leading-tight">{displayName}</p>
+                  <p className="text-[11px] text-on-surface-variant">{displayRole} • {displayEmail}</p>
+                </div>
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-label-md uppercase text-on-surface-variant border border-outline-variant/20">
+                  {displayName.substring(0, 2)}
+                </div>
+                <button onClick={handleLogout} className="px-3 py-2 rounded-xl bg-error-container text-error text-xs font-semibold hover:opacity-90 transition-opacity">
+                  Logout
+                </button>
+              </div>
+            </div>
           </div>
 
-          <button className="p-2 hover:bg-surface-container-highest/50 rounded-full transition-all text-on-surface-variant">
-            <span className="material-symbols-outlined">notifications</span>
-          </button>
+          <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              {showBusinessSwitcher && (
+                <select
+                  className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-3 py-2 text-sm w-full sm:w-auto min-w-[220px]"
+                  value={activeBusinessId}
+                  onChange={(e) => selectBusiness(e.target.value)}
+                >
+                  {businesses.map((business) => (
+                    <option key={business.id} value={business.id}>
+                      {business.name || business.businessName || `Business ${business.id.slice(0, 6)}`}
+                    </option>
+                  ))}
+                </select>
+              )}
 
-          <button className="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md flex items-center gap-2 shadow-lg shadow-primary/20 scale-95 active:scale-90 transition-transform">
-            <span className="material-symbols-outlined text-[20px]">add</span>
-            <span className="hidden sm:inline">New Booking</span>
-          </button>
+              {canCreateBusiness && (
+                <button onClick={openCreateBusiness} className="bg-secondary text-on-secondary px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">storefront</span>
+                  Add Business
+                </button>
+              )}
+            </div>
 
-          <div className="flex items-center gap-2 ml-2 pl-4 border-l border-outline-variant/30">
-            <div className="text-right hidden md:block">
-              <p className="text-label-md text-on-surface font-semibold leading-tight">{displayName}</p>
-              <p className="text-[11px] text-on-surface-variant">{displayRole} • {displayEmail}</p>
+            <div className="flex items-center gap-2 w-full xl:w-auto">
+              <div className="relative group flex-1">
+                <span className="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
+                  <span className="material-symbols-outlined text-[20px]">search</span>
+                </span>
+                <input
+                  type="text"
+                  placeholder="Search bookings..."
+                  className="pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant/20 rounded-full w-full xl:w-64 focus:ring-2 focus:ring-primary transition-all font-body-md shadow-sm outline-none"
+                />
+              </div>
+              <button className="bg-primary text-on-primary px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg shadow-primary/20 whitespace-nowrap">
+                <span className="material-symbols-outlined text-[18px]">add</span>
+                <span className="hidden sm:inline">New Booking</span>
+              </button>
             </div>
-            <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-label-md uppercase text-on-surface-variant border border-outline-variant/20">
-              {displayName.substring(0, 2)}
-            </div>
-            <button onClick={handleLogout} className="px-3 py-2 rounded-xl bg-error-container text-error text-xs font-semibold hover:opacity-90 transition-opacity">
-              Logout
-            </button>
           </div>
         </div>
       </header>

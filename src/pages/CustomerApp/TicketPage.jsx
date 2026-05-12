@@ -7,6 +7,7 @@ import { formatQueueNumber } from '../../utils/queueNumber';
 export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) => {
   const [booking, setBooking] = useState(null);
   const [nowServing, setNowServing] = useState(null);
+  const [activeQueue, setActiveQueue] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,6 +33,40 @@ export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) 
     );
     return () => unsubscribe();
   }, [businessId, booking?.date]);
+
+  useEffect(() => {
+    if (!businessId || !booking?.date) return;
+    const unsubscribe = BookingRepository.subscribeToActiveBookingsByDate(
+      businessId,
+      booking.date,
+      (rows) => {
+        const queueRows = rows
+          .filter((item) => item.status === 'pending' || item.status === 'checked_in' || item.status === 'confirmed')
+          .sort((a, b) => Number(a.queuePosition || 0) - Number(b.queuePosition || 0));
+        setActiveQueue(queueRows);
+      }
+    );
+    return () => unsubscribe();
+  }, [businessId, booking?.date]);
+
+  const currentQueue = Number(booking?.queuePosition || 0);
+  const nowServingQueue = Number(nowServing?.queuePosition || 0);
+  const aheadCount = booking?.status === 'confirmed'
+    ? 0
+    : Math.max(0, currentQueue - (nowServingQueue || 1));
+  const avgDuration = (() => {
+    const durations = activeQueue
+      .map((item) => Number(item.durationMinutes || item.duration || 30))
+      .filter((v) => Number.isFinite(v) && v > 0);
+    if (durations.length === 0) return 30;
+    return Math.round(durations.reduce((sum, v) => sum + v, 0) / durations.length);
+  })();
+  const estWaitMinutes = booking?.status === 'confirmed' ? 0 : aheadCount * avgDuration;
+  const estWaitLabel = booking?.status === 'confirmed'
+    ? 'NOW'
+    : estWaitMinutes <= 0
+      ? '<1m'
+      : `${estWaitMinutes}m`;
 
   if (loading) {
     return (
@@ -86,12 +121,12 @@ export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) 
             <div className="flex items-center gap-8 mt-6">
               <div className="text-center">
                 <p className="text-on-surface-variant text-[12px]">Ahead of you</p>
-                <p className="font-headline-lg-mobile text-[24px] text-on-surface">3</p>
+                <p className="font-headline-lg-mobile text-[24px] text-on-surface">{aheadCount}</p>
               </div>
               <div className="w-[1px] h-10 bg-outline-variant/30"></div>
               <div className="text-center">
                 <p className="text-on-surface-variant text-[12px]">Est. Wait</p>
-                <p className="font-headline-lg-mobile text-[24px] text-primary">{booking?.status === 'confirmed' ? 'NOW' : '15m'}</p>
+                <p className="font-headline-lg-mobile text-[24px] text-primary">{estWaitLabel}</p>
               </div>
             </div>
           </div>
@@ -128,15 +163,6 @@ export const TicketPage = ({ businessId, bookingId, onHome, queueConfig = {} }) 
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="mt-8 flex gap-4">
-          <button className="flex-1 py-4 rounded-xl bg-white/10 text-white font-label-md border border-white/20 hover:bg-white/20 transition-colors">
-            Cancel
-          </button>
-          <button className="flex-1 py-4 rounded-xl bg-white text-primary font-label-md shadow-lg shadow-black/10 hover:bg-surface-bright transition-colors">
-            Reschedule
-          </button>
-        </div>
       </div>
     </div>
   );
