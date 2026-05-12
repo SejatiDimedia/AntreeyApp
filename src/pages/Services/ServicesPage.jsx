@@ -18,7 +18,9 @@ const initialForm = {
   availableStartTime: '09:00',
   availableEndTime: '17:00',
   slotIntervalMinutes: '60',
-  availableTimeSlotsText: ''
+  availableTimeSlotsText: '',
+  dpRequired: true,
+  dpPercent: '30'
 };
 
 export const ServicesPage = () => {
@@ -108,7 +110,9 @@ export const ServicesPage = () => {
       availableStartTime: service.availableStartTime || '09:00',
       availableEndTime: service.availableEndTime || '17:00',
       slotIntervalMinutes: String(service.slotIntervalMinutes || service.durationMinutes || 60),
-      availableTimeSlotsText: Array.isArray(service.availableTimeSlots) ? service.availableTimeSlots.join(', ') : ''
+      availableTimeSlotsText: Array.isArray(service.availableTimeSlots) ? service.availableTimeSlots.join(', ') : '',
+      dpRequired: service.dpRequired !== false,
+      dpPercent: String(service.dpPercent || 30)
     });
     setIsModalOpen(true);
   };
@@ -124,7 +128,9 @@ export const ServicesPage = () => {
       price: Number(formData.price || 0),
       icon: formData.icon || 'inventory_2',
       requiredResourceType: formData.requiredResourceType,
-      resourceIds: formData.requiredResourceType === 'none' ? [] : formData.resourceIds
+      resourceIds: formData.requiredResourceType === 'none' ? [] : formData.resourceIds,
+      dpRequired: Boolean(formData.dpRequired),
+      dpPercent: Number(formData.dpPercent || 0)
     };
 
     if (formData.scheduleMode === 'custom') {
@@ -204,72 +210,78 @@ export const ServicesPage = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSave} className="bg-surface rounded-3xl p-6 w-full max-w-md flex flex-col gap-4">
+          <form onSubmit={handleSave} className="bg-surface rounded-3xl p-6 w-full max-w-4xl flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
             <h3 className="font-headline-lg-mobile text-headline-lg-mobile">{editingService ? 'Edit Service' : 'Add Service'}</h3>
-            <input className="bg-surface-container rounded-xl p-3" placeholder="Title" value={formData.title} onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))} />
-            <textarea className="bg-surface-container rounded-xl p-3" placeholder="Description" value={formData.description} onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} />
-            <input className="bg-surface-container rounded-xl p-3" placeholder="Duration (minutes)" type="number" min="1" value={formData.durationMinutes} onChange={(e) => setFormData((prev) => ({ ...prev, durationMinutes: e.target.value }))} />
-            <input className="bg-surface-container rounded-xl p-3" placeholder="Price (IDR)" type="number" min="1" value={formData.price} onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))} />
-            <select className="bg-surface-container rounded-xl p-3" value={formData.icon} onChange={(e) => setFormData((prev) => ({ ...prev, icon: e.target.value }))}>
-              <option value="inventory_2">inventory_2</option>
-              <option value="build">build</option>
-              <option value="sports_tennis">sports_tennis</option>
-              <option value="fitness_center">fitness_center</option>
-              <option value="medical_services">medical_services</option>
-              <option value="event_available">event_available</option>
-              <option value="design_services">design_services</option>
-              <option value="support_agent">support_agent</option>
-            </select>
-            <select className="bg-surface-container rounded-xl p-3" value={formData.requiredResourceType} onChange={(e) => setFormData((prev) => ({ ...prev, requiredResourceType: e.target.value }))}>
-              <option value="none">No resource required</option>
-              <option value="room">room</option>
-              <option value="seat">seat</option>
-              <option value="field">field</option>
-              <option value="equipment">equipment</option>
-              <option value="custom">custom</option>
-            </select>
-            <div className="bg-surface-container rounded-xl p-3 space-y-3">
-              <p className="text-sm text-on-surface-variant">Available Time Settings</p>
-              <select
-                className="bg-surface rounded-xl p-3 w-full"
-                value={formData.scheduleMode}
-                onChange={(e) => setFormData((prev) => ({ ...prev, scheduleMode: e.target.value }))}
-              >
-                <option value="range">Range (auto generate slots)</option>
-                <option value="custom">Custom slots (manual)</option>
-              </select>
-              {formData.scheduleMode === 'range' ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    className="bg-surface rounded-xl p-3"
-                    type="time"
-                    value={formData.availableStartTime}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, availableStartTime: e.target.value }))}
-                  />
-                  <input
-                    className="bg-surface rounded-xl p-3"
-                    type="time"
-                    value={formData.availableEndTime}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, availableEndTime: e.target.value }))}
-                  />
-                  <input
-                    className="bg-surface rounded-xl p-3 col-span-2"
-                    type="number"
-                    min="5"
-                    placeholder="Slot interval minutes (ex: 30)"
-                    value={formData.slotIntervalMinutes}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, slotIntervalMinutes: e.target.value }))}
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <input className="bg-surface-container rounded-xl p-3 w-full" placeholder="Title" value={formData.title} onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))} />
+                <textarea className="bg-surface-container rounded-xl p-3 w-full min-h-24" placeholder="Description" value={formData.description} onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))} />
+                <div className="grid grid-cols-2 gap-3">
+                  <input className="bg-surface-container rounded-xl p-3 w-full" placeholder="Duration (minutes)" type="number" min="1" value={formData.durationMinutes} onChange={(e) => setFormData((prev) => ({ ...prev, durationMinutes: e.target.value }))} />
+                  <input className="bg-surface-container rounded-xl p-3 w-full" placeholder="Price (IDR)" type="number" min="1" value={formData.price} onChange={(e) => setFormData((prev) => ({ ...prev, price: e.target.value }))} />
                 </div>
-              ) : (
-                <textarea
-                  className="bg-surface rounded-xl p-3 w-full"
-                  rows={3}
-                  placeholder="Custom slots comma separated. Example: 09:00, 09:30, 10:30, 13:00"
-                  value={formData.availableTimeSlotsText}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, availableTimeSlotsText: e.target.value }))}
-                />
-              )}
+                <div className="bg-surface-container rounded-xl p-3 space-y-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(formData.dpRequired)}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, dpRequired: e.target.checked }))}
+                    />
+                    <span>DP Required</span>
+                  </label>
+                  {formData.dpRequired && (
+                    <input
+                      className="bg-surface rounded-xl p-3 w-full"
+                      placeholder="DP Percent (e.g. 30)"
+                      type="number"
+                      min="1"
+                      max="100"
+                      value={formData.dpPercent}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, dpPercent: e.target.value }))}
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="space-y-4">
+                <select className="bg-surface-container rounded-xl p-3 w-full" value={formData.icon} onChange={(e) => setFormData((prev) => ({ ...prev, icon: e.target.value }))}>
+                  <option value="inventory_2">inventory_2</option>
+                  <option value="build">build</option>
+                  <option value="sports_tennis">sports_tennis</option>
+                  <option value="fitness_center">fitness_center</option>
+                  <option value="medical_services">medical_services</option>
+                  <option value="event_available">event_available</option>
+                  <option value="design_services">design_services</option>
+                  <option value="support_agent">support_agent</option>
+                </select>
+                <select className="bg-surface-container rounded-xl p-3 w-full" value={formData.requiredResourceType} onChange={(e) => setFormData((prev) => ({ ...prev, requiredResourceType: e.target.value }))}>
+                  <option value="none">No resource required</option>
+                  <option value="room">room</option>
+                  <option value="seat">seat</option>
+                  <option value="field">field</option>
+                  <option value="equipment">equipment</option>
+                  <option value="custom">custom</option>
+                </select>
+                <div className="bg-surface-container rounded-xl p-3 space-y-3">
+                  <p className="text-sm text-on-surface-variant">Available Time Settings</p>
+                  <select
+                    className="bg-surface rounded-xl p-3 w-full"
+                    value={formData.scheduleMode}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, scheduleMode: e.target.value }))}
+                  >
+                    <option value="range">Range (auto generate slots)</option>
+                    <option value="custom">Custom slots (manual)</option>
+                  </select>
+                  {formData.scheduleMode === 'range' ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      <input className="bg-surface rounded-xl p-3" type="time" value={formData.availableStartTime} onChange={(e) => setFormData((prev) => ({ ...prev, availableStartTime: e.target.value }))} />
+                      <input className="bg-surface rounded-xl p-3" type="time" value={formData.availableEndTime} onChange={(e) => setFormData((prev) => ({ ...prev, availableEndTime: e.target.value }))} />
+                      <input className="bg-surface rounded-xl p-3 col-span-2" type="number" min="5" placeholder="Slot interval minutes (ex: 30)" value={formData.slotIntervalMinutes} onChange={(e) => setFormData((prev) => ({ ...prev, slotIntervalMinutes: e.target.value }))} />
+                    </div>
+                  ) : (
+                    <textarea className="bg-surface rounded-xl p-3 w-full" rows={3} placeholder="Custom slots comma separated. Example: 09:00, 09:30, 10:30, 13:00" value={formData.availableTimeSlotsText} onChange={(e) => setFormData((prev) => ({ ...prev, availableTimeSlotsText: e.target.value }))} />
+                  )}
+                </div>
+              </div>
             </div>
             {formData.requiredResourceType !== 'none' && (
               <div className="bg-surface-container rounded-xl p-3 space-y-2">

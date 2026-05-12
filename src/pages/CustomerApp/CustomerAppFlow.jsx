@@ -7,6 +7,7 @@ import { BusinessRepository } from '../../repositories/BusinessRepository';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useBusiness } from '../../context/BusinessContext';
 import { useAuth } from '../../context/AuthContext';
+import { BookingRepository } from '../../repositories/BookingRepository';
 
 const ACTIVE_BUSINESS_STORAGE_KEY = 'antreey_active_business_id';
 
@@ -25,6 +26,7 @@ export const CustomerAppFlow = () => {
   const [activeBusinessId, setActiveBusinessId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
+  const [awaitingPaymentCount, setAwaitingPaymentCount] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -125,6 +127,22 @@ export const CustomerAppFlow = () => {
     reloadServicesForCustomerBusiness();
   }, [activeBusinessId, userProfile?.role]);
 
+  useEffect(() => {
+    if (!activeBusinessId || !currentUser?.uid) {
+      setAwaitingPaymentCount(0);
+      return;
+    }
+    const unsubscribe = BookingRepository.subscribeToCustomerBookings(
+      activeBusinessId,
+      currentUser.uid,
+      (rows) => {
+        const count = rows.filter((item) => String(item.status || '').toLowerCase() === 'awaiting_payment').length;
+        setAwaitingPaymentCount(count);
+      }
+    );
+    return () => unsubscribe();
+  }, [activeBusinessId, currentUser?.uid]);
+
   const handleServiceSelect = (service) => {
     setSelectedService(service);
     setStep('booking');
@@ -163,6 +181,7 @@ export const CustomerAppFlow = () => {
             error={loadError}
             customerBusinesses={customerBusinesses}
             activeBusinessId={activeBusinessId}
+            awaitingPaymentCount={awaitingPaymentCount}
             onBusinessChange={handleCustomerBusinessChange}
             onOpenMyBookings={() => setStep('mybookings')}
             onServiceSelect={handleServiceSelect} 

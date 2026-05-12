@@ -9,6 +9,17 @@ export const BusinessProfile = ({ formData, onChange }) => {
     onChange('queuePadLengthInput', normalized);
     onChange('queuePadLength', queuePadLength);
   };
+  const paymentMethods = Array.isArray(formData.paymentMethods) ? formData.paymentMethods : [];
+  const updatePaymentMethod = (index, field, value) => {
+    const next = paymentMethods.map((item, idx) => (idx === index ? { ...item, [field]: value } : item));
+    onChange('paymentMethods', next);
+  };
+  const addPaymentMethod = () => {
+    onChange('paymentMethods', [...paymentMethods, { bankName: '', accountName: '', accountNumber: '', note: '' }]);
+  };
+  const removePaymentMethod = (index) => {
+    onChange('paymentMethods', paymentMethods.filter((_, idx) => idx !== index));
+  };
 
   return (
     <section className="glass-card rounded-[24px] overflow-hidden">
@@ -79,6 +90,33 @@ export const BusinessProfile = ({ formData, onChange }) => {
             onChange={(e) => handleQueueDigitInput(e.target.value)}
           />
           <p className="text-label-sm text-on-surface-variant">Contoh: prefix `BDM` + digit `3` menjadi `BDM-001`.</p>
+        </div>
+
+        <div className="col-span-1 md:col-span-2 space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="font-label-md text-on-surface">Payment Methods (Transfer)</label>
+            <button type="button" onClick={addPaymentMethod} className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold">
+              Add Account
+            </button>
+          </div>
+          {paymentMethods.length === 0 && (
+            <p className="text-sm text-on-surface-variant">Belum ada rekening pembayaran. Tambahkan minimal 1 rekening.</p>
+          )}
+          <div className="space-y-3">
+            {paymentMethods.map((method, index) => (
+              <div key={`payment-${index}`} className="p-4 rounded-xl bg-surface-container-low border border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input className="p-3 rounded-xl bg-surface" placeholder="Bank / eWallet name" value={method.bankName || ''} onChange={(e) => updatePaymentMethod(index, 'bankName', e.target.value)} />
+                <input className="p-3 rounded-xl bg-surface" placeholder="Account name" value={method.accountName || ''} onChange={(e) => updatePaymentMethod(index, 'accountName', e.target.value)} />
+                <input className="p-3 rounded-xl bg-surface" placeholder="Account number" value={method.accountNumber || ''} onChange={(e) => updatePaymentMethod(index, 'accountNumber', e.target.value)} />
+                <input className="p-3 rounded-xl bg-surface" placeholder="Note (optional)" value={method.note || ''} onChange={(e) => updatePaymentMethod(index, 'note', e.target.value)} />
+                <div className="md:col-span-2 flex justify-end">
+                  <button type="button" onClick={() => removePaymentMethod(index)} className="px-3 py-1.5 rounded-lg bg-error-container text-error text-xs font-semibold">
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

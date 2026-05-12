@@ -7,6 +7,7 @@ export const StorefrontPage = ({
   error = '',
   customerBusinesses = [],
   activeBusinessId = '',
+  awaitingPaymentCount = 0,
   onBusinessChange,
   onOpenMyBookings,
   onServiceSelect
@@ -61,11 +62,12 @@ export const StorefrontPage = ({
           >
             <span className="material-symbols-outlined text-[18px]">receipt_long</span>
             My Bookings
+            {awaitingPaymentCount > 0 && (
+              <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1 text-[10px] rounded-full bg-amber-500 text-white font-bold">
+                {awaitingPaymentCount}
+              </span>
+            )}
           </button>
-          <div className="flex-shrink-0 flex items-center gap-2 bg-primary-container/30 text-primary px-4 py-2 rounded-full font-label-md">
-            <span className="material-symbols-outlined text-[18px]">star</span>
-            4.9 (120+ Reviews)
-          </div>
           <div className="flex-shrink-0 flex items-center gap-2 bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-full font-label-md">
             <span className="material-symbols-outlined text-[18px]">schedule</span>
             Open 09:00 - 21:00

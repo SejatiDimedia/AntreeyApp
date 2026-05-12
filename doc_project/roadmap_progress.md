@@ -2,7 +2,7 @@
 
 Document updated: 2026-05-12
 
-## 📊 Overall Progress: 97%
+## 📊 Overall Progress: 98%
 Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now moving into the final logic integration and AI enhancement phases.
 
 ---
@@ -80,6 +80,13 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Owner Check-in Flow**: Added Check-in by booking code with modal input and camera QR scanner support.
 - [x] **Customer Ticket Realtime Stats**: `Ahead of you` and `Est. Wait` now calculated from realtime queue data (not dummy).
 - [x] **Bookings Responsive Upgrade**: Improved mobile/tablet layout for bookings table/cards, filters, and top app bar.
+- [x] **Staff Availability Management**: Staff form now supports weekly working days and working hour windows (`availability.startTime`, `availability.endTime`, `availability.workingDays`).
+- [x] **Staff Source from Business Scope**: Add Staff now selects from business-scoped staff users (members/customers mapping fallback), not manual free text identity input.
+- [x] **Weekly Schedule Firestore Integration**: Staff weekly schedule now renders from real bookings + staff availability with dynamic slot occupancy/availability.
+- [x] **Weekly Schedule UX Revamp**: Reworked visual style, spacing, and status clarity (Booked/Available/Off) for better readability.
+- [x] **Weekly Metrics Accuracy Fix**: Schedule header bookings count now aligned with visible weekly slots and active statuses.
+- [x] **Dynamic Hour Range in Weekly Schedule**: Time axis now auto-expands based on staff working hours (not hardcoded to 17:00).
+- [x] **Staff Duplicate Guard**: Prevent adding the same staff user twice in one business (dropdown filter + save-time validation).
 
 ### Phase 8.5: Role-Based Access Control (RBAC) (IN PROGRESS)
 - [x] **Role Definition**: Implement `role` logic in `AuthContext` (Owner, Staff, Customer).
@@ -107,5 +114,8 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Slot Generation from Real Availability**: Customer app disables slots using realtime overlap checks (including walk-in ranges).
 - [x] **Atomic Booking Validation on Submit**: Conflict re-check enforced at submit in repository before write.
 - [x] **Booking Lifecycle Hardening (Core)**: Introduced operational statuses (`checked_in`) and owner operational actions (check-in/cancel/delete).
-- [ ] **Booking Lifecycle Hardening (Final)**: Add explicit `in_progress` transition and consistent Queue TV/Ticket behavior per status.
+- [x] **Booking Lifecycle Hardening (Final)**: Added explicit `in_progress` transition and synchronized Queue TV/Ticket behavior per status.
+- [x] **DP / Payment Proof Flow**: Customer can upload payment proof image via Cloudinary and submit to booking (`paymentProofUrl`, `paymentStatus`, `paymentProofSubmittedAt`).
+- [x] **Owner Payment Review Flow**: Owner can review proof image from bookings page and approve/reject payment to update booking status.
+- [x] **Customer Payment Status UX**: `My Bookings` now shows clear one-line badge for proof submitted state (`Proof Sent · Waiting Review`).
 - [ ] **Hard Transaction Locking**: Move critical conflict validation into Firestore transaction/cloud function for race-condition proofing.

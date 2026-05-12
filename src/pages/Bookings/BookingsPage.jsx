@@ -53,6 +53,12 @@ export const BookingsPage = () => {
     title: '',
     message: ''
   });
+  const [reviewModal, setReviewModal] = useState({
+    open: false,
+    booking: null,
+    note: '',
+    submitting: false
+  });
 
   const getCurrentRoundedTime = () => {
     const now = new Date();
@@ -166,6 +172,33 @@ export const BookingsPage = () => {
     } catch (error) {
       console.error('Delete booking failed:', error);
       toast.error('Failed to delete booking.');
+    }
+  };
+
+  const openPaymentReview = (booking) => {
+    setReviewModal({
+      open: true,
+      booking,
+      note: booking?.paymentReviewNote || '',
+      submitting: false
+    });
+  };
+
+  const handleReviewPayment = async (decision) => {
+    if (!activeBusiness?.id || !reviewModal.booking?.id) return;
+    setReviewModal((prev) => ({ ...prev, submitting: true }));
+    try {
+      await BookingRepository.reviewPaymentProof(
+        activeBusiness.id,
+        reviewModal.booking.id,
+        decision,
+        reviewModal.note
+      );
+      toast.success(decision === 'approve' ? 'Payment approved.' : 'Payment rejected.');
+      setReviewModal({ open: false, booking: null, note: '', submitting: false });
+    } catch (error) {
+      toast.error('Failed to review payment proof.');
+      setReviewModal((prev) => ({ ...prev, submitting: false }));
     }
   };
 
@@ -374,6 +407,7 @@ export const BookingsPage = () => {
               setScannerSupported(true);
               setCheckInModalOpen(true);
             }}
+            onReviewPayment={openPaymentReview}
             queueConfig={{
               prefix: activeBusiness?.queuePrefix || 'A',
               padLength: Number(activeBusiness?.queuePadLength || 1)
@@ -579,6 +613,59 @@ export const BookingsPage = () => {
                 className={`px-4 py-2 rounded-xl text-white font-semibold ${confirmDialog.action === 'delete' ? 'bg-error' : 'bg-tertiary'}`}
               >
                 {confirmDialog.action === 'delete' ? 'Yes, Delete' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {reviewModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40" onClick={() => !reviewModal.submitting && setReviewModal({ open: false, booking: null, note: '', submitting: false })} />
+          <div className="relative w-full max-w-lg bg-white rounded-3xl border border-outline-variant/20 shadow-2xl overflow-hidden">
+            <div className="px-6 py-5 border-b border-outline-variant/20 bg-blue-50">
+              <h3 className="font-headline-lg-mobile text-[22px] text-on-surface">Review Payment Proof</h3>
+              <p className="text-sm text-on-surface-variant">Check transfer proof before confirming booking.</p>
+            </div>
+            <div className="p-6 space-y-4">
+              {reviewModal.booking?.paymentProofUrl ? (
+                <a href={reviewModal.booking.paymentProofUrl} target="_blank" rel="noreferrer" className="block">
+                  <img src={reviewModal.booking.paymentProofUrl} alt="Payment proof" className="w-full max-h-80 object-contain rounded-2xl border border-outline-variant/20 bg-surface-container-low" />
+                </a>
+              ) : (
+                <div className="rounded-2xl border border-outline-variant/20 bg-surface-container-low p-4 text-sm text-on-surface-variant">
+                  No proof image found.
+                </div>
+              )}
+              <textarea
+                className="w-full p-3 rounded-xl border border-outline-variant/30 bg-surface-container-low"
+                rows={3}
+                placeholder="Internal note (optional)"
+                value={reviewModal.note}
+                onChange={(e) => setReviewModal((prev) => ({ ...prev, note: e.target.value }))}
+              />
+            </div>
+            <div className="px-6 pb-6 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setReviewModal({ open: false, booking: null, note: '', submitting: false })}
+                disabled={reviewModal.submitting}
+                className="px-5 py-2.5 rounded-xl border border-outline-variant/30 text-on-surface"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => handleReviewPayment('reject')}
+                disabled={reviewModal.submitting}
+                className="px-5 py-2.5 rounded-xl bg-rose-100 text-rose-700 font-semibold"
+              >
+                Reject
+              </button>
+              <button
+                onClick={() => handleReviewPayment('approve')}
+                disabled={reviewModal.submitting}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold"
+              >
+                Approve
               </button>
             </div>
           </div>

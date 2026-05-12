@@ -16,7 +16,8 @@ export const SettingsPage = () => {
     description: '',
     queuePrefix: 'A',
     queuePadLength: 1,
-    queuePadLengthInput: '1'
+    queuePadLengthInput: '1',
+    paymentMethods: []
   });
 
   useEffect(() => {
@@ -27,7 +28,8 @@ export const SettingsPage = () => {
       description: activeBusiness.description || '',
       queuePrefix: activeBusiness.queuePrefix || 'A',
       queuePadLength: Number(activeBusiness.queuePadLength || 1),
-      queuePadLengthInput: String(activeBusiness.queuePadLength || 1)
+      queuePadLengthInput: String(activeBusiness.queuePadLength || 1),
+      paymentMethods: Array.isArray(activeBusiness.paymentMethods) ? activeBusiness.paymentMethods : []
     });
   }, [activeBusiness]);
 

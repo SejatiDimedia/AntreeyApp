@@ -48,6 +48,28 @@ service cloud.firestore {
       return hasActiveMembership(businessId)
         && (roleInBusiness(businessId) == 'owner' || roleInBusiness(businessId) == 'admin');
     }
+    function isBookingOwnerUpdate(businessId) {
+      return (
+        (
+          ('customerId' in resource.data)
+          && resource.data.customerId == request.auth.uid
+          && request.resource.data.customerId == resource.data.customerId
+        )
+        || (
+          ('userId' in resource.data)
+          && resource.data.userId == request.auth.uid
+          && request.resource.data.userId == resource.data.userId
+        )
+      );
+    }
+    function isPaymentProofUpdateOnly() {
+      return request.resource.data.diff(resource.data).changedKeys().hasOnly([
+        'paymentProofUrl',
+        'paymentProofNote',
+        'paymentStatus',
+        'paymentProofSubmittedAt'
+      ]);
+    }
 
     match /users/{userId} {
       allow read: if isSelf(userId) || isGlobalAdmin();
@@ -91,8 +113,10 @@ service cloud.firestore {
           );
 
         allow update: if isBusinessManager(businessId)
-          || (resource.data.userId == request.auth.uid
-            && request.resource.data.userId == resource.data.userId);
+          || (
+            isSignedIn()
+            && isPaymentProofUpdateOnly()
+          );
 
         allow delete: if isBusinessManager(businessId);
       }

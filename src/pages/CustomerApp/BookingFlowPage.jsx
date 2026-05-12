@@ -189,6 +189,10 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
     setLoading(true);
     setSubmitError('');
     try {
+      const servicePrice = Number(service?.price || 0);
+      const dpRequired = service?.dpRequired !== false;
+      const dpPercent = Number(service?.dpPercent || 30);
+      const depositAmount = dpRequired ? Math.round((servicePrice * dpPercent) / 100) : 0;
       const bookingData = {
         serviceId: service.id,
         serviceName: service.name || service.title || 'Service',
@@ -202,7 +206,11 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
         customerName: userProfile?.name || currentUser.displayName || currentUser.email || 'Customer',
         customerEmail: currentUser.email || '',
         customerPhone: userProfile?.phone || '',
-        status: 'pending'
+        status: dpRequired ? 'awaiting_payment' : 'pending',
+        paymentRequired: dpRequired,
+        dpPercent,
+        depositAmount,
+        paymentStatus: dpRequired ? 'awaiting_payment' : 'not_required'
       };
       
       const result = await BookingRepository.createBooking(businessId, bookingData);
@@ -373,7 +381,7 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
               : 'bg-surface-container-highest text-on-surface-variant opacity-50 cursor-not-allowed'
           }`}
         >
-          {loading ? 'Processing...' : 'Confirm Details'}
+          {loading ? 'Processing...' : service?.dpRequired !== false ? 'Confirm & Continue to Payment' : 'Confirm Details'}
           {!loading && <span className="material-symbols-outlined text-[20px]">arrow_forward</span>}
         </button>
       </div>

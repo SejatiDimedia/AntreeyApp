@@ -114,7 +114,7 @@ export const BookingRepository = {
         queuePosition,
         businessId,
         createdAt: new Date().toISOString(),
-        status: 'pending' // pending, confirmed, completed, cancelled
+        status: bookingData.status || 'pending' // pending, awaiting_payment, confirmed, completed, cancelled
       });
       return { id: docRef.id, ...bookingData, queuePosition };
     } catch (error) {
@@ -144,6 +144,43 @@ export const BookingRepository = {
       return { success: true };
     } catch (error) {
       console.error('Error updating booking status:', error);
+      throw error;
+    }
+  },
+  async submitPaymentProof(businessId, bookingId, payload = {}) {
+    try {
+      const bookingRef = doc(db, `businesses/${businessId}/bookings`, bookingId);
+      await updateDoc(bookingRef, {
+        paymentProofUrl: payload.paymentProofUrl || '',
+        paymentProofNote: payload.paymentProofNote || '',
+        paymentStatus: 'proof_submitted',
+        paymentProofSubmittedAt: new Date().toISOString()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error submitting payment proof:', error);
+      throw error;
+    }
+  },
+  async reviewPaymentProof(businessId, bookingId, decision = 'approve', note = '') {
+    try {
+      const bookingRef = doc(db, `businesses/${businessId}/bookings`, bookingId);
+      const normalized = String(decision || '').toLowerCase();
+      const payload = {
+        paymentReviewedAt: new Date().toISOString(),
+        paymentReviewNote: note || ''
+      };
+      if (normalized === 'approve') {
+        payload.paymentStatus = 'approved';
+        payload.status = 'confirmed';
+      } else {
+        payload.paymentStatus = 'rejected';
+        payload.status = 'awaiting_payment';
+      }
+      await updateDoc(bookingRef, payload);
+      return { success: true };
+    } catch (error) {
+      console.error('Error reviewing payment proof:', error);
       throw error;
     }
   },
