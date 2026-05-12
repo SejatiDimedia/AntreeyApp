@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Antreey - Services Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8faf3",
+                        "inverse-primary": "#9dd823",
+                        "on-surface-variant": "#434935",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#486800",
+                        "on-secondary-container": "#636262",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#e2dfde",
+                        "surface-container-low": "#f2f4ed",
+                        "on-error": "#ffffff",
+                        "background": "#f8faf3",
+                        "on-tertiary-container": "#476000",
+                        "on-primary-container": "#436100",
+                        "surface-container-highest": "#e1e3dc",
+                        "primary-fixed": "#b8f642",
+                        "on-background": "#191c18",
+                        "tertiary-fixed-dim": "#add458",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#354e00",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#131f00",
+                        "surface-container": "#edefe8",
+                        "secondary-fixed": "#e5e2e1",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "outline": "#737a63",
+                        "tertiary": "#4c6700",
+                        "primary-container": "#a6e22e",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#c9f171",
+                        "surface-container-high": "#e7e9e2",
+                        "surface": "#f8faf3",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#191c18",
+                        "outline-variant": "#c3cab0",
+                        "inverse-on-surface": "#eff2eb",
+                        "on-secondary-fixed-variant": "#474746",
+                        "primary-fixed-dim": "#9dd823",
+                        "on-tertiary-fixed-variant": "#384e00",
+                        "primary": "#486800",
+                        "surface-dim": "#d9dbd4",
+                        "tertiary-container": "#b6dd60",
+                        "secondary": "#5f5e5e",
+                        "inverse-surface": "#2e312d",
+                        "on-tertiary-fixed": "#141f00",
+                        "surface-variant": "#e1e3dc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.25rem",
+                        "3xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "card-gap": "20px",
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "section-margin": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f7f9f2; }
+        .glass-container {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface">
+<!-- Sidebar Shell -->
+<aside class="fixed left-0 top-0 h-full z-40 h-screen w-[80px] flex flex-col items-center py-6 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline shadow-sm">
+<div class="mb-10 scale-95 active:scale-90 transition-transform">
+<div class="w-12 h-12 bg-inverse-surface rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+</div>
+</div>
+<nav class="flex flex-col gap-6 items-center flex-1">
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">calendar_today</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">event_note</span>
+</button>
+<!-- Active State: Services -->
+<button class="bg-primary-container text-on-primary-container rounded-xl p-3 shadow-sm transition-transform scale-95 active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">storefront</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">medical_services</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">group</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">monitoring</span>
+</button>
+</nav>
+<div class="mt-auto flex flex-col gap-4 items-center">
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 rounded-xl">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container shadow-sm">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxdi63l9G46hn5V3LvrXRUytOIeHYfb7MDf7W0IGNh6BXXDqAgzaqGJJUNaDp668NijNQiYfl2vy0qV32ADnujHE4YAMI2844TPuXFt_aVrj5iUkYxZqiyLMEL_4bn6mgwfX-BBnkzbrKh58-v4RhWFlvG-FQhnjiUH-k1VL1RQLSn_lqE1kZTD-9EePz6hONfXnUB6yz8Ci6Tm8GUbGU0zGmtEnfhx_rbcKIqCyNKXjVSNlIRJJaOLFvH9agFYfyWtdiuVN6Xs6TZ"/>
+</div>
+</div>
+</aside>
+<!-- Header Shell -->
+<header class="flex items-center justify-between px-gutter w-full ml-[80px] pr- gutter max-w-[calc(100%-80px)] h-20 bg-transparent fixed top-0 z-30">
+<div class="flex items-center gap-8 w-full">
+<div class="flex flex-col">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">Services</h1>
+<p class="text-label-sm text-on-surface-variant font-label-sm">Manage your offerings and pricing</p>
+</div>
+<div class="flex-1 max-w-xl relative group ml-12">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<input class="w-full h-12 pl-12 pr-4 bg-white/60 backdrop-blur-md border-none focus:ring-2 focus:ring-primary rounded-full transition-all placeholder:text-on-surface-variant/50" placeholder="Search services..." type="text"/>
+<div class="absolute inset-y-0 right-4 flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary">tune</span>
+</div>
+</div>
+<div class="flex items-center gap-4 ml-auto px-6">
+<button class="w-12 h-12 flex items-center justify-center rounded-full hover:bg-surface-container-highest/50 transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-[1px] bg-outline-variant"></div>
+<div class="flex items-center gap-3 bg-primary-container text-on-primary-container px-6 py-2.5 rounded-full font-label-md cursor-pointer hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+<span>Add New Service</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[80px] pt-24 px-8 min-h-screen">
+<!-- Bento Grid Layout for Services -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-20">
+<!-- Category Header / Highlighted Card (Asymmetric) -->
+<div class="lg:col-span-2 glass-container rounded-3xl p-8 flex flex-col justify-between min-h-[280px] bg-gradient-to-br from-primary-container/20 to-white/50 relative overflow-hidden group">
+<div class="absolute -right-10 -top-10 w-48 h-48 bg-primary-container/30 rounded-full blur-3xl group-hover:bg-primary-container/50 transition-all duration-700"></div>
+<div class="z-10">
+<span class="bg-primary text-on-primary text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full">Top Performer</span>
+<h2 class="font-headline-xl text-headline-xl text-on-surface mt-4">Professional Haircut + Beard Styling</h2>
+<p class="text-on-surface-variant text-body-md mt-2 max-w-sm">The ultimate grooming experience including steam towel treatment and precision line-up.</p>
+</div>
+<div class="z-10 flex items-center justify-between mt-6">
+<div class="flex flex-col">
+<span class="text-label-sm text-on-surface-variant uppercase font-bold">Base Price</span>
+<span class="font-headline-lg text-headline-lg text-primary">$45.00</span>
+</div>
+<div class="flex gap-2">
+<button class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-on-surface-variant hover:text-primary shadow-sm hover:shadow transition-all"><span class="material-symbols-outlined">edit</span></button>
+<button class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-on-surface-variant hover:text-error shadow-sm hover:shadow transition-all"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Service Card: Consultation -->
+<div class="glass-container rounded-3xl p-6 flex flex-col transition-transform hover:-translate-y-1">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">chat_bubble</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Private Consultation</h3>
+<p class="text-on-surface-variant text-body-md mb-8 flex-1">1-on-1 session to discuss style preferences and care routines.</p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold">30 MIN</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">$20.00</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-on-surface-variant hover:bg-error-container hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Service Card: Yoga -->
+<div class="glass-container rounded-3xl p-6 flex flex-col transition-transform hover:-translate-y-1">
+<div class="w-14 h-14 bg-tertiary-container/30 rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-tertiary text-3xl">self_improvement</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Morning Yoga Class</h3>
+<p class="text-on-surface-variant text-body-md mb-8 flex-1">Group sessions focusing on mindfulness and physical flexibility.</p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold">60 MIN</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">$15.00</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-on-surface-variant hover:bg-error-container hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Service Card: Kids Cut -->
+<div class="glass-container rounded-3xl p-6 flex flex-col transition-transform hover:-translate-y-1">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">child_care</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Kids Special Cut</h3>
+<p class="text-on-surface-variant text-body-md mb-8 flex-1">Gentle styling for the little ones in a fun, calm environment.</p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold">20 MIN</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">$25.00</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-on-surface-variant hover:bg-error-container hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Service Card: Skin Care -->
+<div class="glass-container rounded-3xl p-6 flex flex-col transition-transform hover:-translate-y-1">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">face</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Luxury Facial</h3>
+<p class="text-on-surface-variant text-body-md mb-8 flex-1">Deep cleansing and hydration using premium organic products.</p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold">45 MIN</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">$60.00</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-on-surface-variant hover:bg-error-container hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Service Card: Styling -->
+<div class="glass-container rounded-3xl p-6 flex flex-col transition-transform hover:-translate-y-1">
+<div class="w-14 h-14 bg-surface-container-high rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl">content_cut</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Style + Blow Dry</h3>
+<p class="text-on-surface-variant text-body-md mb-8 flex-1">Professional styling for events or a refreshed weekly look.</p>
+<div class="flex items-center justify-between pt-4 border-t border-outline-variant/30">
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold">40 MIN</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">$35.00</p>
+</div>
+<div class="flex gap-1">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container hover:text-primary rounded-lg transition-colors"><span class="material-symbols-outlined">edit</span></button>
+<button class="p-2 text-on-surface-variant hover:bg-error-container hover:text-error rounded-lg transition-colors"><span class="material-symbols-outlined">delete</span></button>
+</div>
+</div>
+</div>
+<!-- Add New Placeholder -->
+<div class="border-2 border-dashed border-outline-variant rounded-3xl p-6 flex flex-col items-center justify-center text-on-surface-variant/40 group hover:border-primary/40 hover:text-primary/60 cursor-pointer transition-all min-h-[300px]">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">add</span>
+</div>
+<p class="font-headline-lg-mobile text-headline-lg-mobile">New Service</p>
+<p class="text-label-sm text-center px-6 mt-2">Expand your business by adding more options</p>
+</div>
+</div>
+<!-- Section: Analytics Overview -->
+<section class="mt-8 mb-12">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-6">Service Distribution</h2>
+<div class="glass-container rounded-3xl p-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold uppercase">Average Price</p>
+<p class="text-headline-lg-mobile text-headline-lg-mobile">$33.50</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-tertiary/10 text-tertiary rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold uppercase">Avg. Duration</p>
+<p class="text-headline-lg-mobile text-headline-lg-mobile">38 Min</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-on-surface/5 text-on-surface rounded-2xl flex items-center justify-center">
+<span class="material-symbols-outlined">inventory_2</span>
+</div>
+<div>
+<p class="text-label-sm text-on-surface-variant font-bold uppercase">Total Categories</p>
+<p class="text-headline-lg-mobile text-headline-lg-mobile">4 Active</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Contextual FAB (Only on main dashboard or search screens as per instruction) -->
+<!-- In this case, we have a prominent 'Add New' in the header and a placeholder card, so a FAB is not rendered to maintain UI balance -->
+</body></html>

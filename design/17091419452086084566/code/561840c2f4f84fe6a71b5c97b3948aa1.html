@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Antreey - Bookings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-bright": "#f8faf3",
+                        "inverse-primary": "#9dd823",
+                        "on-surface-variant": "#434935",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#486800",
+                        "on-secondary-container": "#636262",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#e2dfde",
+                        "surface-container-low": "#f2f4ed",
+                        "on-error": "#ffffff",
+                        "background": "#f8faf3",
+                        "on-tertiary-container": "#476000",
+                        "on-primary-container": "#436100",
+                        "surface-container-highest": "#e1e3dc",
+                        "primary-fixed": "#b8f642",
+                        "on-background": "#191c18",
+                        "tertiary-fixed-dim": "#add458",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#354e00",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#131f00",
+                        "surface-container": "#edefe8",
+                        "secondary-fixed": "#e5e2e1",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "outline": "#737a63",
+                        "tertiary": "#4c6700",
+                        "primary-container": "#a6e22e",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#c9f171",
+                        "surface-container-high": "#e7e9e2",
+                        "surface": "#f8faf3",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#191c18",
+                        "outline-variant": "#c3cab0",
+                        "inverse-on-surface": "#eff2eb",
+                        "on-secondary-fixed-variant": "#474746",
+                        "primary-fixed-dim": "#9dd823",
+                        "on-tertiary-fixed-variant": "#384e00",
+                        "primary": "#486800",
+                        "surface-dim": "#d9dbd4",
+                        "tertiary-container": "#b6dd60",
+                        "secondary": "#5f5e5e",
+                        "inverse-surface": "#2e312d",
+                        "on-tertiary-fixed": "#141f00",
+                        "surface-variant": "#e1e3dc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "card-gap": "20px",
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "section-margin": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface-bright font-body-md text-on-surface">
+<!-- SideNavBar (Authority: JSON) -->
+<nav class="fixed left-0 top-0 h-full z-40 bg-surface-container-lowest dark:bg-inverse-surface h-screen w-[80px] flex flex-col items-center py-6 border-r border-outline-variant dark:border-outline shadow-sm">
+<div class="mb-10">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-headline-lg">grid_view</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-4">
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+</a>
+<!-- Active Tab: Bookings -->
+<a class="bg-primary-container text-on-primary-container rounded-xl p-3 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_note</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">storefront</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">medical_services</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">group</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">support_agent</span>
+</a>
+</div>
+<div class="mt-auto">
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">settings</span>
+</a>
+<div class="mt-4">
+<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpFFLqhOdfl3BnRvjXCqhe8H7bZmMFZxC-e3sACYlCn3I5Vp3tioTsEkA5NwUsut_x7EVvR6Bn1rrfSWInBgBPj5xu1SjFTVSJO_RteKJWw45M_-WEao-bJrDI8U61JXjhVYcTCOEqW4LR9hyUjJzpnzNB-FsLwA_syAy0YmB1OjCIu28F4qbMvA9zhA0wWNSIAus9G3NB_MqFGJTyb_HKcXDbVYREi44IwOGWA0LlKlvQPiwDmcsw54scWlgrihItrYy-BFTKCMpl"/>
+</div>
+</div>
+</nav>
+<div class="ml-[80px] min-h-screen flex flex-col">
+<!-- TopAppBar (Authority: JSON) -->
+<header class="flex items-center justify-between px-gutter w-full h-20 bg-transparent">
+<div class="flex items-center gap-4">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Bookings</h1>
+<div class="bg-primary-container/20 text-primary px-4 py-1.5 rounded-full font-label-md flex items-center gap-2">
+<span class="w-2 h-2 bg-primary rounded-full"></span>
+                    12 Active Today
+                </div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative group">
+<span class="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-lowest border-none rounded-full w-64 focus:ring-2 focus:ring-primary transition-all font-body-md shadow-sm" placeholder="Search bookings..." type="text"/>
+</div>
+<button class="p-2 hover:bg-surface-container-highest/50 rounded-full transition-all text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-label-md flex items-center gap-2 shadow-lg shadow-primary/20 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    New Booking
+                </button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 p-gutter max-w-[1400px] w-full mx-auto">
+<!-- Filters Bar -->
+<div class="glass-card rounded-xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md transition-colors whitespace-nowrap">All Services</button>
+<button class="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Haircut</button>
+<button class="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Styling</button>
+<button class="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Spa Treatments</button>
+<button class="bg-white/50 text-on-surface-variant px-4 py-2 rounded-lg font-label-md hover:bg-primary-container transition-colors whitespace-nowrap border border-outline-variant/30">Coloring</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-white/50 rounded-lg px-4 py-2 flex items-center gap-2 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+<span class="font-label-md">12 Oct, 2025</span>
+</div>
+<button class="bg-white/50 p-2 rounded-lg border border-outline-variant/30 text-on-surface-variant hover:text-primary">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Bento Booking Table -->
+<div class="grid grid-cols-12 gap-card-gap">
+<!-- Main Booking Table Container -->
+<div class="col-span-12 lg:col-span-9 glass-card rounded-3xl overflow-hidden flex flex-col">
+<div class="bg-inverse-surface p-6 flex justify-between items-center">
+<h2 class="text-inverse-on-surface font-headline-lg-mobile">Upcoming Reservations</h2>
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-full font-label-md flex items-center gap-2 hover:bg-primary-fixed-dim transition-colors">
+                            View full calendar <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-primary-container/10">
+<tr>
+<th class="p-6 font-label-md text-on-surface-variant border-b border-outline-variant/20">Time</th>
+<th class="p-6 font-label-md text-on-surface-variant border-b border-outline-variant/20">Customer</th>
+<th class="p-6 font-label-md text-on-surface-variant border-b border-outline-variant/20">Service</th>
+<th class="p-6 font-label-md text-on-surface-variant border-b border-outline-variant/20">Staff</th>
+<th class="p-6 font-label-md text-on-surface-variant border-b border-outline-variant/20">Status</th>
+<th class="p-6 font-label-md text-on-surface-variant border-b border-outline-variant/20"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="bg-primary-container/5 hover:bg-primary-container/10 transition-colors">
+<td class="p-6">
+<div class="font-headline-lg-mobile text-primary">14:00</div>
+<div class="text-label-sm text-on-surface-variant">45 mins</div>
+</td>
+<td class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-label-md">RE</div>
+<div>
+<div class="font-label-md">Rendy</div>
+<div class="text-label-sm text-on-surface-variant">+62 869 1234 5670</div>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="bg-white/60 px-3 py-1 rounded-full text-label-sm border border-outline-variant/20">Haircut + Beard</span>
+</td>
+<td class="p-6">
+<div class="bg-secondary-container/50 px-4 py-1 rounded-full inline-block font-label-sm">Widodo</div>
+</td>
+<td class="p-6">
+<span class="flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md">Confirmed</span>
+</span>
+</td>
+<td class="p-6 text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="p-6">
+<div class="font-headline-lg-mobile">14:00</div>
+<div class="text-label-sm text-on-surface-variant">30 mins</div>
+</td>
+<td class="p-6">
+<div class="flex items-center gap-3">
+<img alt="Gerald D" class="w-10 h-10 rounded-full border border-outline-variant/20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC20KsMXbSczeOZK9W9SrByJlDBMt9QSJlpNv63fgD8LEe4pZgTMc4nHfoyw0Qc-wbTFam5oylIutj6ZDAChaCo9AyXOMKpG9C4dRMLDNISVOAJYmuMzUwQnBvfUdxZuMcXk2GWAs_p5VcJbT9ySnblhN0lrvjBvuMy3OusIq8l7Rty8jegsWPnGMlbAmi4jhat0yuI8xRbY-C5xQt_alU8vJBughPZ5lAC8dpKk_x23qhN3Jt3j-srDKQwPx6pjFao1GbF3kOfTzcQ"/>
+<div>
+<div class="font-label-md">Gerald D</div>
+<div class="text-label-sm text-on-surface-variant">+62 869 1234 5671</div>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="bg-white/60 px-3 py-1 rounded-full text-label-sm border border-outline-variant/20">Haircut</span>
+</td>
+<td class="p-6">
+<div class="bg-secondary-container/50 px-4 py-1 rounded-full inline-block font-label-sm">Darent</div>
+</td>
+<td class="p-6">
+<span class="flex items-center gap-1.5 text-tertiary">
+<span class="material-symbols-outlined text-[18px]">pending</span>
+<span class="font-label-md">Pending</span>
+</span>
+</td>
+<td class="p-6 text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="p-6">
+<div class="font-headline-lg-mobile">15:00</div>
+<div class="text-label-sm text-on-surface-variant">60 mins</div>
+</td>
+<td class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-label-md">VI</div>
+<div>
+<div class="font-label-md">Vincent</div>
+<div class="text-label-sm text-on-surface-variant">+62 869 1234 5672</div>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="bg-white/60 px-3 py-1 rounded-full text-label-sm border border-outline-variant/20">Haircut</span>
+</td>
+<td class="p-6">
+<div class="bg-secondary-container/50 px-4 py-1 rounded-full inline-block font-label-sm">Widodo</div>
+</td>
+<td class="p-6">
+<span class="flex items-center gap-1.5 text-primary">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-md">Confirmed</span>
+</span>
+</td>
+<td class="p-6 text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-high transition-colors">
+<td class="p-6">
+<div class="font-headline-lg-mobile">15:00</div>
+<div class="text-label-sm text-on-surface-variant">90 mins</div>
+</td>
+<td class="p-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center font-label-md">HI</div>
+<div>
+<div class="font-label-md">Hillicurt</div>
+<div class="text-label-sm text-on-surface-variant">+62 869 1234 5673</div>
+</div>
+</div>
+</td>
+<td class="p-6">
+<span class="bg-white/60 px-3 py-1 rounded-full text-label-sm border border-outline-variant/20">Haircut + Styling</span>
+</td>
+<td class="p-6">
+<div class="bg-secondary-container/50 px-4 py-1 rounded-full inline-block font-label-sm">Linus</div>
+</td>
+<td class="p-6">
+<span class="flex items-center gap-1.5 text-error">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+<span class="font-label-md">Cancelled</span>
+</span>
+</td>
+<td class="p-6 text-right">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Sidebar Calendar & Stats (Bento Style) -->
+<div class="col-span-12 lg:col-span-3 flex flex-col gap-card-gap">
+<!-- Calendar Card -->
+<div class="bg-primary p-6 rounded-3xl text-on-primary">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-lg-mobile">October</h3>
+<button class="p-1 hover:bg-white/20 rounded-lg">
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+</div>
+<div class="grid grid-cols-7 gap-2 text-center font-label-sm opacity-70 mb-2">
+<div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+</div>
+<div class="grid grid-cols-7 gap-2 text-center font-body-md">
+<div class="p-2 opacity-30">29</div>
+<div class="p-2 opacity-30">30</div>
+<div class="p-2">1</div>
+<div class="p-2">2</div>
+<div class="p-2">3</div>
+<div class="p-2">4</div>
+<div class="p-2">5</div>
+<div class="p-2">6</div>
+<div class="p-2">7</div>
+<div class="p-2">8</div>
+<div class="p-2">9</div>
+<div class="p-2">10</div>
+<div class="p-2">11</div>
+<div class="p-2 bg-inverse-surface text-inverse-on-surface rounded-full">12</div>
+<div class="p-2">13</div>
+<div class="p-2">14</div>
+<div class="p-2">15</div>
+<div class="p-2">16</div>
+<div class="p-2">17</div>
+<div class="p-2">18</div>
+<div class="p-2">19</div>
+<div class="p-2">20</div>
+<div class="p-2">21</div>
+<div class="p-2">22</div>
+<div class="p-2">23</div>
+<div class="p-2">24</div>
+<div class="p-2">25</div>
+</div>
+</div>
+<!-- Weekly Chart Card -->
+<div class="glass-card p-6 rounded-3xl">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-label-md">Weekly Bookings</h3>
+<span class="text-label-sm text-on-surface-variant">Last Week</span>
+</div>
+<div class="flex items-end justify-between h-32 gap-2 mt-4">
+<div class="w-full bg-primary/20 rounded-full h-1/2 group relative">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface text-[10px] px-2 py-1 rounded hidden group-hover:block">10</div>
+</div>
+<div class="w-full bg-primary/40 rounded-full h-2/3 group relative">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface text-[10px] px-2 py-1 rounded hidden group-hover:block">15</div>
+</div>
+<div class="w-full bg-primary/60 rounded-full h-1/3 group relative"></div>
+<div class="w-full bg-primary/80 rounded-full h-4/5 group relative"></div>
+<div class="w-full bg-primary rounded-full h-full group relative">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-inverse-surface text-inverse-on-surface text-[10px] px-2 py-1 rounded hidden group-hover:block">25</div>
+</div>
+<div class="w-full bg-primary/30 rounded-full h-1/2 group relative"></div>
+<div class="w-full bg-primary/50 rounded-full h-2/3 group relative"></div>
+</div>
+<div class="flex justify-between mt-4 text-label-sm text-on-surface-variant">
+<span>Mon</span><span>Wed</span><span>Fri</span><span>Sun</span>
+</div>
+</div>
+<!-- Quick Insights -->
+<div class="glass-card p-6 rounded-3xl flex items-center justify-between border-l-4 border-primary">
+<div>
+<p class="text-label-sm text-on-surface-variant">Busiest Slot</p>
+<p class="font-headline-lg-mobile text-primary">14:00 - 15:30</p>
+</div>
+<span class="material-symbols-outlined text-primary text-[32px]">bolt</span>
+</div>
+</div>
+</div>
+<!-- Promotion / Announcement Banner (Asymmetric Layout) -->
+<div class="mt-section-margin grid grid-cols-1 md:grid-cols-3 gap-card-gap">
+<div class="md:col-span-2 relative overflow-hidden rounded-3xl h-64 bg-inverse-surface group cursor-pointer">
+<img alt="Interior Salon" class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" data-alt="A wide-angle, high-end photograph of a modern boutique salon interior. The space is filled with warm, soft sunlight streaming through floor-to-ceiling windows. Sleek lime green and charcoal furniture provides a vibrant contrast against the minimalist white walls. The atmosphere is peaceful, professional, and sophisticated, perfectly capturing a premium light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC8Zo9h5nES1ajK3-YxQYbA0um8xVJcz1yGmmN_W423GEczPPqDQ716YoKKF04RMCGnW7_wi0fmcKc8C8ECJAdaPrumK4P32T1bEWbW4f0tsOkdln8Gq1jmLTznQmOqMYQkkb_MCPNuKIrItQxfuoLk42EyHwQfhfipXCaH6YLAeGHPRLdgXcrVBdjIqThJIsc-kJyeqM94wPFKxJQoseofSgVAeqeRzCHM2u0BXq9caykqVGzHnJ5lWekM7G0KzBTnRESAVYMVM5_"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent p-10 flex flex-col justify-end">
+<span class="bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm w-fit mb-4">Manager's Choice</span>
+<h3 class="text-white font-headline-lg">Enhance your booking experience with Antreey Pro</h3>
+<p class="text-white/70 font-body-md mt-2">Unlock unlimited staff accounts and automated WhatsApp reminders.</p>
+</div>
+</div>
+<div class="glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center gap-4 border-2 border-dashed border-primary/20">
+<div class="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">volunteer_activism</span>
+</div>
+<div>
+<h4 class="font-headline-lg-mobile">Customer Loyalty</h4>
+<p class="text-on-surface-variant font-body-md">Reward your regular clients with discount points automatically.</p>
+</div>
+<button class="text-primary font-label-md border-b-2 border-primary">Learn more</button>
+</div>
+</div>
+</main>
+</div>
+</body></html>

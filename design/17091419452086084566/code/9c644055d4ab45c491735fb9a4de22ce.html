@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Antreey - Customer Database</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-bright": "#f8faf3",
+            "inverse-primary": "#9dd823",
+            "on-surface-variant": "#434935",
+            "error": "#ba1a1a",
+            "surface-tint": "#486800",
+            "on-secondary-container": "#636262",
+            "on-tertiary": "#ffffff",
+            "secondary-container": "#e2dfde",
+            "surface-container-low": "#f2f4ed",
+            "on-error": "#ffffff",
+            "background": "#f8faf3",
+            "on-tertiary-container": "#476000",
+            "on-primary-container": "#436100",
+            "surface-container-highest": "#e1e3dc",
+            "primary-fixed": "#b8f642",
+            "on-background": "#191c18",
+            "tertiary-fixed-dim": "#add458",
+            "on-error-container": "#93000a",
+            "on-secondary-fixed": "#1c1b1b",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed-variant": "#354e00",
+            "on-secondary": "#ffffff",
+            "on-primary-fixed": "#131f00",
+            "surface-container": "#edefe8",
+            "secondary-fixed": "#e5e2e1",
+            "secondary-fixed-dim": "#c8c6c5",
+            "outline": "#737a63",
+            "tertiary": "#4c6700",
+            "primary-container": "#a6e22e",
+            "on-primary": "#ffffff",
+            "tertiary-fixed": "#c9f171",
+            "surface-container-high": "#e7e9e2",
+            "surface": "#f8faf3",
+            "error-container": "#ffdad6",
+            "on-surface": "#191c18",
+            "outline-variant": "#c3cab0",
+            "inverse-on-surface": "#eff2eb",
+            "on-secondary-fixed-variant": "#474746",
+            "primary-fixed-dim": "#9dd823",
+            "on-tertiary-fixed-variant": "#384e00",
+            "primary": "#486800",
+            "surface-dim": "#d9dbd4",
+            "tertiary-container": "#b6dd60",
+            "secondary": "#5f5e5e",
+            "inverse-surface": "#2e312d",
+            "on-tertiary-fixed": "#141f00",
+            "surface-variant": "#e1e3dc"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "unit": "8px",
+            "card-gap": "20px",
+            "gutter": "16px",
+            "container-padding": "24px",
+            "section-margin": "48px"
+          },
+          "fontFamily": {
+            "headline-xl": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "label-md": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #f8faf3;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .sidebar-active {
+      background-color: #a6e22e;
+      color: #131f00;
+      border-radius: 0.75rem;
+    }
+  </style>
+</head>
+<body class="flex min-h-screen">
+<!-- Side Navigation Rail -->
+<aside class="fixed left-0 top-0 h-full z-40 bg-surface-container-lowest dark:bg-inverse-surface border-r border-outline-variant dark:border-outline h-screen w-[80px] flex flex-col items-center py-6 shadow-sm">
+<div class="mb-10">
+<div class="w-12 h-12 bg-inverse-surface rounded-xl flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-[32px]">grid_view</span>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-4">
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Dashboard">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Schedule">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Bookings">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Services">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Staff">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+</a>
+<!-- Active Tab: Customers -->
+<a class="bg-primary-container text-on-primary-container rounded-xl p-3 scale-95 active:scale-90 transition-transform" href="#" title="Customers">
+<span class="material-symbols-outlined" data-icon="group" style="font-variation-settings: 'FILL' 1;">group</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Analytics">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+</a>
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Support">
+<span class="material-symbols-outlined" data-icon="support_agent">support_agent</span>
+</a>
+</nav>
+<div class="mt-auto">
+<a class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform" href="#" title="Settings">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[80px] flex-1 flex flex-col min-h-screen relative">
+<!-- Top App Bar -->
+<header class="flex items-center justify-between px-gutter w-full h-20 ml-0 bg-transparent">
+<div class="flex flex-col">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Customers</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Manage your customer database and booking history</p>
+</div>
+<div class="flex-1 max-w-xl mx-8">
+<div class="relative flex items-center w-full bg-surface-container-highest/30 rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant mr-3" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full text-body-md text-on-surface placeholder:text-on-surface-variant" placeholder="Search for customers, contact or ID..." type="text"/>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-highest/50 rounded-full p-1 transition-all" data-icon="tune">tune</button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-3 text-on-surface-variant hover:bg-surface-container-highest/50 rounded-full transition-all relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-3 right-3 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="h-10 w-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy5NTsDl9uKD1EqNzgnU6QbnMsXYyNE_TszPh7dJAxbkI4ohFKd6kmp4osVWFrg9xfzdKsP9-fRavdivHk1r5y7AjuC6k71qURD2rD7dE7KalWUEwAWEX-WOv40C3eVF5_rEl1vbMhVDwt_VPDAoj8_MO6A1BIkAM0byLvfIc5Mw8rbRGjy2hoq7_FeFKeQFIR7yweJx8DvdM9tEehtAqGzeNiDcqNc6YikifnNwEF5nznLYsY-FagY0CxPQ-8WzfSrD3YceyDxgP1"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<section class="p-gutter flex flex-col gap-card-gap">
+<!-- Stats Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-card-gap">
+<div class="glass-card rounded-[24px] p-container-padding flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-primary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Total Customers</p>
+<p class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">1,284</p>
+</div>
+</div>
+<div class="glass-card rounded-[24px] p-container-padding flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">New this Month</p>
+<p class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">42</p>
+</div>
+</div>
+<div class="glass-card rounded-[24px] p-container-padding flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-secondary-container/50 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="stars">stars</span>
+</div>
+<div>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Repeat Customers</p>
+<p class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">65%</p>
+</div>
+</div>
+<div class="glass-card rounded-[24px] p-container-padding flex items-center justify-center">
+<button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full font-label-md hover:shadow-lg hover:shadow-primary/20 transition-all">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+            Add New Customer
+          </button>
+</div>
+</div>
+<!-- Customer List Table -->
+<div class="glass-card rounded-[32px] overflow-hidden flex flex-col border border-white/40">
+<!-- Table Header -->
+<div class="bg-inverse-surface text-on-primary px-container-padding py-6 flex items-center justify-between">
+<h2 class="text-headline-lg-mobile font-headline-lg-mobile flex items-center gap-2">
+            Database <span class="text-primary-container text-body-md font-body-md">1,284 Records</span>
+</h2>
+<div class="flex gap-2">
+<button class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-label-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+              Filters
+            </button>
+<button class="bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl text-label-sm flex items-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span>
+              Export CSV
+            </button>
+</div>
+</div>
+<!-- Main List Content -->
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-on-surface-variant font-label-sm border-b border-outline-variant/20">
+<th class="px-6 py-4 font-label-sm">Customer Details</th>
+<th class="px-6 py-4 font-label-sm">Contact Info</th>
+<th class="px-6 py-4 font-label-sm">Booking History</th>
+<th class="px-6 py-4 font-label-sm">Last Visit</th>
+<th class="px-6 py-4 font-label-sm">Status</th>
+<th class="px-6 py-4 font-label-sm text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Customer Row 1 -->
+<tr class="hover:bg-primary-container/10 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Customer" class="w-10 h-10 rounded-full bg-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfpt84paflpFmDX3x9xTbmNbaevEX18RuEEKzhJoyV4NSxUhaNNd4tZ-23PsMLTSj19lDFlMq02lHbvXUlQSba77wOpMey26kZ9PqCsy-mC3E42ZJL_vei2uU7xzDO2QPcRapdwPrIuYWz-wTh4WLkjDfmFnNeA87hVMCCMjCgUO8SvQKRo84SBUpP2hFqC_uqyJss5vMEddM7mdWEAhaZ_rHZPI5VzZTXPRr6P7nfous3G9qfbv_sTGQ7mEVpAh6q-FjzYW4hfKql"/>
+<div>
+<p class="font-label-md text-on-surface">Rendy Pratama</p>
+<p class="text-[12px] text-on-surface-variant">ID: ANT-9283</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">+62 869 1234 5670</p>
+<p class="text-[12px] text-on-surface-variant">rendy.p@email.com</p>
+</td>
+<td class="px-6 py-4 text-center">
+<div class="flex flex-col items-start">
+<span class="font-body-md text-on-surface">12 Bookings</span>
+<span class="text-[12px] text-primary font-label-sm">Platinum Member</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">14 Oct 2024</p>
+<p class="text-[12px] text-on-surface-variant">14:00 - Haircut + Beard</p>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary-container/40 text-on-primary-container rounded-full text-[12px] font-label-md">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container p-2 rounded-full transition-all material-symbols-outlined" data-icon="visibility">visibility</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest p-2 rounded-full transition-all material-symbols-outlined" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+<!-- Customer Row 2 -->
+<tr class="hover:bg-primary-container/10 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Customer" class="w-10 h-10 rounded-full bg-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-gFPOYZlgo5-Xmy-4jkuvLdeL6b-qE5p1GGpRXJNKtC63UcUDH9v9yiCFdDMjjatquI7E2S1GH5z2FwBUsNY_btt-BpJXtiofb9J7QmpyIIXMgEiS9uygmuPBa91TMsgdUguS38O_L-2NOVHKmq_0ywdd2nTX-KhgblDerrynmbSJEdyk-GmpPLrn4n3Fg9wGpqte3dHPfNqTZbdW3Yqkh-C_qERtytefMcJwM8c89wS0CgvdWpLlK0MLiIZ_4MGU1kanCFj-KCO0"/>
+<div>
+<p class="font-label-md text-on-surface">Gerald Darmawan</p>
+<p class="text-[12px] text-on-surface-variant">ID: ANT-1102</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">+62 821 9876 5432</p>
+<p class="text-[12px] text-on-surface-variant">gerald.d@email.com</p>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col items-start">
+<span class="font-body-md text-on-surface">5 Bookings</span>
+<span class="text-[12px] text-on-surface-variant font-label-sm">Standard</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">12 Oct 2024</p>
+<p class="text-[12px] text-on-surface-variant">15:00 - Haircut</p>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-[12px] font-label-md">Idle</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container p-2 rounded-full transition-all material-symbols-outlined" data-icon="visibility">visibility</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest p-2 rounded-full transition-all material-symbols-outlined" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+<!-- Customer Row 3 -->
+<tr class="bg-primary-container/5 hover:bg-primary-container/10 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Customer" class="w-10 h-10 rounded-full bg-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM_9qOv0MzJa6VVGHtheacG9a2KUZ3Fj6iYXBjqFT2f_jmQHEoBJdmslQ14RWF8KwqBDVNg7L-yew6v_r1yB8NtjQSO1ObXDU1WEvBbq72Bmn4dtoUh35kQAMY3yhQpaAmfAcMyOEOrd0wciJ_gzVwYa5P_OBOCsqbRvp2B67j7ea2sfTH3E94yUJLdreE7H4DVazqNEA7NkudSM1rj_oWwyQ7Qb5C-85A7CmSArP5qP_WzeKyNIVSA2_zbyvONfdPkTEGJZ9VVWW0"/>
+<div>
+<p class="font-label-md text-on-surface">Vincent Kho</p>
+<p class="text-[12px] text-on-surface-variant">ID: ANT-4451</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">+62 812 0000 9999</p>
+<p class="text-[12px] text-on-surface-variant">v.kho@email.com</p>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col items-start">
+<span class="font-body-md text-on-surface">24 Bookings</span>
+<span class="text-[12px] text-primary font-label-sm">Diamond Member</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">09 Oct 2024</p>
+<p class="text-[12px] text-on-surface-variant">10:00 - Spa Treatment</p>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-primary-container/40 text-on-primary-container rounded-full text-[12px] font-label-md">Active</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container p-2 rounded-full transition-all material-symbols-outlined" data-icon="visibility">visibility</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest p-2 rounded-full transition-all material-symbols-outlined" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+<!-- Customer Row 4 -->
+<tr class="hover:bg-primary-container/10 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Customer" class="w-10 h-10 rounded-full bg-surface-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdDbqb5dzuAnaMdxbz9-jdBgzs_dpIXJwsKTlt0bugcJNTPbLCZjwQf9LMrYzab0BKRUBn50yVZfz3u1fHuJFxLU7A7VpC0ueqls3TfaQXeR8Ol1Ck6YzwU-QkzqudzDNJx-CXLmAt3eP96BygAYUfyjEFOp2oY28_a1OnCN6HG9gRL-Iuq77m0lmiFOPOtaSIZsv3fH8IFQSUmCjPIiwhlc3cn-vR8NUVzYI0nmjDjF7J79Y5vbI48jVvJ6DWU8hYFKkfcKHd9wLe"/>
+<div>
+<p class="font-label-md text-on-surface">Hillicurt Smith</p>
+<p class="text-[12px] text-on-surface-variant">ID: ANT-0032</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">+62 855 1212 3434</p>
+<p class="text-[12px] text-on-surface-variant">h.smith@email.com</p>
+</td>
+<td class="px-6 py-4">
+<div class="flex flex-col items-start">
+<span class="font-body-md text-on-surface">1 Booking</span>
+<span class="text-[12px] text-tertiary font-label-sm">New Lead</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<p class="font-body-md text-on-surface">05 Oct 2024</p>
+<p class="text-[12px] text-on-surface-variant">11:00 - Consultation</p>
+</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 bg-error-container text-on-error-container rounded-full text-[12px] font-label-md">At Risk</span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container p-2 rounded-full transition-all material-symbols-outlined" data-icon="visibility">visibility</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest p-2 rounded-full transition-all material-symbols-outlined" data-icon="more_vert">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="bg-surface-container-low px-container-padding py-4 flex items-center justify-between border-t border-outline-variant/10">
+<p class="text-label-sm text-on-surface-variant">Showing 1 to 10 of 1,284 customers</p>
+<div class="flex items-center gap-2">
+<button class="p-2 rounded-lg hover:bg-surface-container-highest/50 disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary text-on-primary text-label-sm">1</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container-highest/50 text-label-sm text-on-surface">2</button>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container-highest/50 text-label-sm text-on-surface">3</button>
+<span class="text-on-surface-variant">...</span>
+<button class="w-8 h-8 rounded-lg hover:bg-surface-container-highest/50 text-label-sm text-on-surface">129</button>
+<button class="p-2 rounded-lg hover:bg-surface-container-highest/50">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Asymmetric Detail Preview (Bento Section) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-card-gap">
+<!-- Customer Profile Summary -->
+<div class="lg:col-span-4 glass-card rounded-[24px] p-container-padding relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed/20 rounded-bl-full -mr-10 -mt-10"></div>
+<div class="flex items-start justify-between mb-6">
+<div class="relative">
+<img alt="Active Customer Preview" class="w-20 h-20 rounded-2xl bg-primary-container p-1 border-2 border-white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANEQ_M-HWtp1Z_aKe3cNWkHGpSSKI0jmrvLLjrbAX7wz--1R68Kju_oe8IeQFrtKHaFSj-Xojr_1C7XF5qI0ARs10n4Y-wkZiBYfGAYBcyykXWW-AkzNKD7w36BIztV6u_q5aieStjdQwNbJFuUXHunCWRPWuRnWsSjt2AfjX8sHI-1YgScuqU1ehzhMZ31jIs_UBFGSA6zzCuTcsmEM6ZdH99LiCzsj7acYlcpZMYLlqBL54dCWQhtNMFBdd0xZGVIYpfyzFSzt46"/>
+<span class="absolute -bottom-1 -right-1 w-5 h-5 bg-primary border-2 border-white rounded-full"></span>
+</div>
+<button class="bg-surface text-on-surface-variant p-2 rounded-full border border-outline-variant/20 shadow-sm">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">Rendy Pratama</h3>
+<p class="text-body-md text-on-surface-variant mb-4">Elite Member since Aug 2023</p>
+<div class="space-y-3">
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="call">call</span>
+<span class="text-label-md">+62 869 1234 5670</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="mail">mail</span>
+<span class="text-label-md">rendy.p@email.com</span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary" data-icon="location_on">location_on</span>
+<span class="text-label-md">Jakarta, Indonesia</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/20 flex gap-4">
+<button class="flex-1 bg-inverse-surface text-on-primary py-3 rounded-xl font-label-md text-center hover:bg-on-surface transition-colors">Book Now</button>
+<button class="p-3 bg-surface-container text-on-surface rounded-xl hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</button>
+</div>
+</div>
+<!-- Recent Activity Feed -->
+<div class="lg:col-span-8 glass-card rounded-[24px] p-container-padding">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-headline-lg-mobile font-headline-lg-mobile text-on-surface">Recent Activity</h3>
+<button class="text-primary font-label-md hover:underline">View History</button>
+</div>
+<div class="space-y-4">
+<div class="flex items-start gap-4 p-4 rounded-2xl bg-surface-container-low border border-white/40">
+<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="font-label-md text-on-surface">Service Completed</p>
+<span class="text-[12px] text-on-surface-variant">2 days ago</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Haircut + Beard Trim with <span class="font-label-md">Widodo</span></p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/10">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="font-label-md text-on-surface">Payment Successful</p>
+<span class="text-[12px] text-on-surface-variant">2 days ago</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Paid <span class="font-label-md">Rp 150.000</span> for invoice #INV-293</p>
+</div>
+</div>
+<div class="flex items-start gap-4 p-4 rounded-2xl border border-outline-variant/10">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest/30 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<p class="font-label-md text-on-surface">Upcoming Appointment</p>
+<span class="text-[12px] text-primary font-label-md">Scheduled</span>
+</div>
+<p class="text-body-md text-on-surface-variant">Full Grooming on <span class="font-label-md">28 Oct 2024 at 10:00</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- FAB for quick action -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-[32px]" data-icon="person_add">person_add</span>
+</button>
+</main>
+<!-- Visual Background Accents (Glassmorphism Context) -->
+<div class="fixed -bottom-20 -left-20 w-[400px] h-[400px] bg-primary-fixed/20 blur-[100px] rounded-full -z-10"></div>
+<div class="fixed top-20 -right-20 w-[300px] h-[300px] bg-tertiary-fixed/20 blur-[80px] rounded-full -z-10"></div>
+</body></html>

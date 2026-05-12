@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function membershipPath(businessId, uid) {
+      return /databases/$(database)/documents/businesses/$(businessId)/members/$(uid);
+    }
+
+    function customerPath(businessId, uid) {
+      return /databases/$(database)/documents/businesses/$(businessId)/customers/$(uid);
+    }
+
+    function hasActiveMembership(businessId) {
+      return exists(membershipPath(businessId, request.auth.uid))
+        && get(membershipPath(businessId, request.auth.uid)).data.status == 'active';
+    }
+
+    function hasCustomerMembership(businessId) {
+      return exists(customerPath(businessId, request.auth.uid));
+    }
+
+    function canAccessBusiness(businessId) {
+      return hasActiveMembership(businessId)
+        || hasCustomerMembership(businessId)
+        || isGlobalAdmin()
+        || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
+    }
+
+    function isGlobalAdmin() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+          || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner');
+    }
+
+    function roleInBusiness(businessId) {
+      return get(membershipPath(businessId, request.auth.uid)).data.roleInBusiness;
+    }
+
+    function isBusinessManager(businessId) {
+      return hasActiveMembership(businessId)
+        && (roleInBusiness(businessId) == 'owner' || roleInBusiness(businessId) == 'admin');
+    }
+
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isGlobalAdmin();
+      allow create, update: if isSelf(userId) || isGlobalAdmin();
+      allow delete: if false;
+    }
+
+    match /businesses/{businessId} {
+      allow read: if canAccessBusiness(businessId);
+      allow create: if isSignedIn(); // Allow any signed in user to create a business for now (MVP)
+      allow update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
+
+      match /members/{uid} {
+        allow read: if isSelf(uid) || isBusinessManager(businessId) || isGlobalAdmin();
+        allow create: if isSelf(uid) || isBusinessManager(businessId) || isGlobalAdmin();
+        allow update, delete: if isBusinessManager(businessId) || isGlobalAdmin();
+      }
+
+      match /services/{serviceId} {
+        allow read: if canAccessBusiness(businessId);
+        allow create, update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
+      }
+
+      match /staff/{staffId} {
+        allow read: if canAccessBusiness(businessId);
+        allow create, update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
+      }
+
+      match /resources/{resourceId} {
+        allow read: if canAccessBusiness(businessId);
+        allow create, update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
+      }
+
+      match /bookings/{bookingId} {
+        allow read: if canAccessBusiness(businessId);
+
+        allow create: if canAccessBusiness(businessId)
+          && (
+            !('userId' in request.resource.data)
+            || request.resource.data.userId == request.auth.uid
+          );
+
+        allow update: if isBusinessManager(businessId)
+          || (resource.data.userId == request.auth.uid
+            && request.resource.data.userId == resource.data.userId);
+
+        allow delete: if isBusinessManager(businessId);
+      }
+    }
+  }
+}

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Antreey - Business Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-bright": "#f8faf3",
+                "inverse-primary": "#9dd823",
+                "on-surface-variant": "#434935",
+                "error": "#ba1a1a",
+                "surface-tint": "#486800",
+                "on-secondary-container": "#636262",
+                "on-tertiary": "#ffffff",
+                "secondary-container": "#e2dfde",
+                "surface-container-low": "#f2f4ed",
+                "on-error": "#ffffff",
+                "background": "#f8faf3",
+                "on-tertiary-container": "#476000",
+                "on-primary-container": "#436100",
+                "surface-container-highest": "#e1e3dc",
+                "primary-fixed": "#b8f642",
+                "on-background": "#191c18",
+                "tertiary-fixed-dim": "#add458",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed": "#1c1b1b",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed-variant": "#354e00",
+                "on-secondary": "#ffffff",
+                "on-primary-fixed": "#131f00",
+                "surface-container": "#edefe8",
+                "secondary-fixed": "#e5e2e1",
+                "secondary-fixed-dim": "#c8c6c5",
+                "outline": "#737a63",
+                "tertiary": "#4c6700",
+                "primary-container": "#a6e22e",
+                "on-primary": "#ffffff",
+                "tertiary-fixed": "#c9f171",
+                "surface-container-high": "#e7e9e2",
+                "surface": "#f8faf3",
+                "error-container": "#ffdad6",
+                "on-surface": "#191c18",
+                "outline-variant": "#c3cab0",
+                "inverse-on-surface": "#eff2eb",
+                "on-secondary-fixed-variant": "#474746",
+                "primary-fixed-dim": "#9dd823",
+                "on-tertiary-fixed-variant": "#384e00",
+                "primary": "#486800",
+                "surface-dim": "#d9dbd4",
+                "tertiary-container": "#b6dd60",
+                "secondary": "#5f5e5e",
+                "inverse-surface": "#2e312d",
+                "on-tertiary-fixed": "#141f00",
+                "surface-variant": "#e1e3dc"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "unit": "8px",
+                "card-gap": "20px",
+                "gutter": "16px",
+                "container-padding": "24px",
+                "section-margin": "48px"
+            },
+            "fontFamily": {
+                "headline-xl": ["Plus Jakarta Sans"],
+                "headline-lg": ["Plus Jakarta Sans"],
+                "body-md": ["Plus Jakarta Sans"],
+                "body-lg": ["Plus Jakarta Sans"],
+                "headline-lg-mobile": ["Plus Jakarta Sans"],
+                "label-md": ["Plus Jakarta Sans"],
+                "label-sm": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #486800;
+            box-shadow: 0 0 0 2px rgba(157, 216, 35, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-surface-bright text-on-surface font-body-md min-h-screen">
+<!-- SideNavBar Shell -->
+<nav class="fixed left-0 top-0 h-full z-40 bg-surface-container-lowest dark:bg-inverse-surface h-screen w-[80px] flex flex-col items-center py-6 border-r border-outline-variant dark:border-outline shadow-sm">
+<div class="mb-8">
+<div class="w-12 h-12 bg-on-background rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl" data-icon="grid_view">grid_view</span>
+</div>
+</div>
+<div class="flex flex-col gap-4 flex-grow">
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="storefront">storefront</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="medical_services">medical_services</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+</button>
+</div>
+<div class="mt-auto flex flex-col gap-4">
+<button class="bg-primary-container text-on-primary-container rounded-xl p-3 hover:bg-surface-container-high transition-colors duration-200 scale-95 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A professional headshot of a young business woman with a friendly smile, photographed in a modern office setting with soft, natural lighting. The image captures a clean, professional aesthetic with a blurred background of green office plants and minimalist decor, emphasizing the high-tech yet approachable brand identity of Antreey." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxz6OCzCWePGxGsBj9Gb2BSU2vkiziNI3iK8hZvM0TJm3w2NAGkQ-jyHuqXOJ_8C28JvqhFslPtwVBevNmJmvAmwAKB89joP_8fDOpnwc0XtNj-xGn4psG5MSbLmb54CD_Y4cJEINCu6gnuIUUHLZzQpu9fjTnf81pk4vqcCueovAVdKic1k0fEqo_523mnyC9EGrnRSLO43r4OYCjHU-vKdryPDUPVdYUE65M3_myS_ui2zaDYUcndJYTPBJhPLn2cCuu0LIqXZgr"/>
+</div>
+</div>
+</nav>
+<main class="ml-[80px] min-h-screen">
+<!-- TopAppBar -->
+<header class="flex items-center justify-between px-gutter w-full ml-0 pr-gutter max-w-full h-20 bg-transparent">
+<div class="flex items-center gap-6">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Settings</h1>
+<p class="text-on-surface-variant font-label-sm">Manage your business profile and preferences</p>
+</div>
+</div>
+<div class="flex-grow max-w-xl mx-8">
+<div class="relative flex items-center group">
+<span class="material-symbols-outlined absolute left-4 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container-low rounded-full border-none focus-within:ring-2 focus-within:ring-primary text-body-md" placeholder="Search for settings..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-3 text-on-surface-variant hover:bg-surface-container-highest/50 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="bg-primary text-white px-6 py-3 rounded-full font-label-md flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-transform active:scale-95">
+                    Save Changes
+                </button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-gutter lg:p-10 max-w-7xl mx-auto grid grid-cols-12 gap-card-gap">
+<!-- Navigation Sidebar (Internal) -->
+<div class="col-span-12 lg:col-span-3">
+<div class="glass-card rounded-[24px] p-6 flex flex-col gap-2 sticky top-24">
+<button class="flex items-center gap-3 w-full p-4 rounded-xl bg-primary text-white font-label-md text-left transition-all">
+<span class="material-symbols-outlined" data-icon="business">business</span>
+                        Business Profile
+                    </button>
+<button class="flex items-center gap-3 w-full p-4 rounded-xl text-on-surface-variant hover:bg-surface-container-high font-label-md text-left transition-all">
+<span class="material-symbols-outlined" data-icon="schedule">schedule</span>
+                        Operating Hours
+                    </button>
+<button class="flex items-center gap-3 w-full p-4 rounded-xl text-on-surface-variant hover:bg-surface-container-high font-label-md text-left transition-all">
+<span class="material-symbols-outlined" data-icon="notifications_active">notifications_active</span>
+                        Notifications
+                    </button>
+<button class="flex items-center gap-3 w-full p-4 rounded-xl text-on-surface-variant hover:bg-surface-container-high font-label-md text-left transition-all">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+                        Billing &amp; Plans
+                    </button>
+<button class="flex items-center gap-3 w-full p-4 rounded-xl text-on-surface-variant hover:bg-surface-container-high font-label-md text-left transition-all">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+                        Privacy &amp; Security
+                    </button>
+</div>
+</div>
+<!-- Configuration Form Area -->
+<div class="col-span-12 lg:col-span-9 space-y-card-gap">
+<!-- Business Profile Section -->
+<section class="glass-card rounded-[24px] overflow-hidden">
+<div class="p-8 border-b border-outline-variant/30">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Business Profile</h2>
+<p class="text-on-surface-variant text-body-md mt-1">This information will be visible to your customers on the booking page.</p>
+</div>
+<div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="col-span-1 md:col-span-2 flex items-center gap-8">
+<div class="relative group">
+<div class="w-24 h-24 rounded-[32px] bg-surface-container flex items-center justify-center overflow-hidden border-2 border-dashed border-outline">
+<span class="material-symbols-outlined text-outline text-3xl group-hover:hidden" data-icon="add_a_photo">add_a_photo</span>
+<div class="absolute inset-0 bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="text-primary font-label-sm">Edit</span>
+</div>
+</div>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface">Business Logo</h4>
+<p class="text-label-sm text-on-surface-variant">SVG, PNG, JPG up to 10MB. Recommended 256x256px.</p>
+<button class="mt-2 text-primary font-label-sm hover:underline">Upload new logo</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface">Business Name</label>
+<input class="w-full p-4 bg-surface-container-low rounded-xl border-none text-body-md" type="text" value="Antreey Creative Studio"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-md text-on-surface">Business Category</label>
+<select class="w-full p-4 bg-surface-container-low rounded-xl border-none text-body-md appearance-none">
+<option>Hair Salon &amp; Spa</option>
+<option>Medical Clinic</option>
+<option>Fitness Center</option>
+<option>Creative Agency</option>
+</select>
+</div>
+<div class="col-span-1 md:col-span-2 space-y-2">
+<label class="font-label-md text-on-surface">Description</label>
+<textarea class="w-full p-4 bg-surface-container-low rounded-xl border-none text-body-md resize-none" rows="4">Premium styling and grooming services in the heart of the city. We offer a range of services from haircuts to spa treatments designed for the modern professional.</textarea>
+</div>
+</div>
+</section>
+<!-- Operating Hours Section -->
+<section class="glass-card rounded-[24px] overflow-hidden">
+<div class="p-8 border-b border-outline-variant/30 flex justify-between items-center">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Operating Hours</h2>
+<p class="text-on-surface-variant text-body-md mt-1">Set your weekly availability for bookings.</p>
+</div>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-label-sm">Auto-Save Active</span>
+</div>
+<div class="p-8 space-y-4">
+<!-- Monday -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low/50 rounded-2xl hover:bg-surface-container-low transition-colors">
+<div class="flex items-center gap-4 w-32">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-label-md">Monday</span>
+</div>
+<div class="flex items-center gap-6">
+<input class="bg-transparent border-none font-body-md" type="time" value="09:00"/>
+<span class="text-on-surface-variant">to</span>
+<input class="bg-transparent border-none font-body-md" type="time" value="18:00"/>
+</div>
+<button class="p-2 text-error hover:bg-error/5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+<!-- Tuesday -->
+<div class="flex items-center justify-between p-4 bg-surface-container-low/50 rounded-2xl">
+<div class="flex items-center gap-4 w-32">
+<div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-label-md">Tuesday</span>
+</div>
+<div class="flex items-center gap-6">
+<input class="bg-transparent border-none font-body-md" type="time" value="09:00"/>
+<span class="text-on-surface-variant">to</span>
+<input class="bg-transparent border-none font-body-md" type="time" value="18:00"/>
+</div>
+<button class="p-2 text-error hover:bg-error/5 rounded-full">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+<!-- Sunday (Closed) -->
+<div class="flex items-center justify-between p-4 bg-surface-container-highest/30 rounded-2xl opacity-60">
+<div class="flex items-center gap-4 w-32">
+<div class="w-10 h-10 rounded-full bg-on-surface-variant/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="do_not_disturb_on">do_not_disturb_on</span>
+</div>
+<span class="font-label-md">Sunday</span>
+</div>
+<div class="flex items-center gap-6 italic text-on-surface-variant">
+<span>Closed for all bookings</span>
+</div>
+<button class="p-2 text-primary hover:bg-primary/5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Notifications Preference Section -->
+<section class="glass-card rounded-[24px] overflow-hidden">
+<div class="p-8 border-b border-outline-variant/30">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Notification Preferences</h2>
+<p class="text-on-surface-variant text-body-md mt-1">Control how you and your customers stay updated.</p>
+</div>
+<div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-card-gap">
+<!-- WhatsApp -->
+<div class="p-6 bg-surface-container-low/50 rounded-2xl flex flex-col justify-between border-l-4 border-[#25D366]">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-[#25D366]/10 rounded-xl flex items-center justify-center text-[#25D366]">
+<span class="material-symbols-outlined text-3xl" data-icon="chat">chat</span>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface">WhatsApp Notifications</h4>
+<p class="text-label-sm text-on-surface-variant">Send instant alerts to customers</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Email -->
+<div class="p-6 bg-surface-container-low/50 rounded-2xl flex flex-col justify-between border-l-4 border-primary">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="mail">mail</span>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface">Email Marketing</h4>
+<p class="text-label-sm text-on-surface-variant">Send weekly digests &amp; offers</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Staff Alert -->
+<div class="p-6 bg-surface-container-low/50 rounded-2xl flex flex-col justify-between border-l-4 border-on-surface-variant">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-on-surface-variant/10 rounded-xl flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-3xl" data-icon="campaign">campaign</span>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface">Staff Push Alerts</h4>
+<p class="text-label-sm text-on-surface-variant">Notify staff of new bookings</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+<!-- Daily Summary -->
+<div class="p-6 bg-surface-container-low/50 rounded-2xl flex flex-col justify-between border-l-4 border-primary-container">
+<div class="flex items-start justify-between">
+<div class="flex items-center gap-3">
+<div class="w-12 h-12 bg-primary-container/20 rounded-xl flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl" data-icon="summarize">summarize</span>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface">Daily Summary</h4>
+<p class="text-label-sm text-on-surface-variant">Morning email with daily schedule</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Save Banner -->
+<div class="glass-card rounded-[24px] p-6 flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-primary/20">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="verified_user">verified_user</span>
+</div>
+<div>
+<h4 class="font-label-md">Ready to publish changes?</h4>
+<p class="text-label-sm text-on-surface-variant">Updates to your business profile will be live instantly.</p>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 rounded-full border border-outline text-on-surface font-label-md hover:bg-surface-container-high">Discard</button>
+<button class="px-8 py-3 rounded-full bg-primary text-white font-label-md shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Save &amp; Update Profile</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

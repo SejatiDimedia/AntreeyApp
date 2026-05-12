@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Antreey - Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#e7e9e2",
+                      "outline-variant": "#c3cab0",
+                      "on-primary-container": "#436100",
+                      "primary": "#486800",
+                      "secondary": "#5f5e5e",
+                      "surface-container-highest": "#e1e3dc",
+                      "secondary-fixed-dim": "#c8c6c5",
+                      "on-surface-variant": "#434935",
+                      "inverse-primary": "#9dd823",
+                      "on-tertiary-container": "#476000",
+                      "inverse-on-surface": "#eff2eb",
+                      "on-background": "#191c18",
+                      "error-container": "#ffdad6",
+                      "surface-variant": "#e1e3dc",
+                      "on-secondary-container": "#636262",
+                      "on-tertiary-fixed-variant": "#384e00",
+                      "secondary-fixed": "#e5e2e1",
+                      "tertiary": "#4c6700",
+                      "secondary-container": "#e2dfde",
+                      "on-primary-fixed-variant": "#354e00",
+                      "on-error-container": "#93000a",
+                      "on-secondary-fixed-variant": "#474746",
+                      "tertiary-fixed": "#c9f171",
+                      "on-primary-fixed": "#131f00",
+                      "surface": "#f8faf3",
+                      "on-surface": "#191c18",
+                      "on-error": "#ffffff",
+                      "tertiary-container": "#b6dd60",
+                      "surface-container": "#edefe8",
+                      "outline": "#737a63",
+                      "primary-container": "#a6e22e",
+                      "error": "#ba1a1a",
+                      "surface-dim": "#d9dbd4",
+                      "surface-container-low": "#f2f4ed",
+                      "primary-fixed-dim": "#9dd823",
+                      "on-primary": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "8px",
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "section-margin": "48px",
+                      "card-gap": "20px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "label-md": ["Plus Jakarta Sans"],
+                      "headline-xl": ["Plus Jakarta Sans"],
+                      "body-md": ["Plus Jakarta Sans"],
+                      "body-lg": ["Plus Jakarta Sans"],
+                      "label-sm": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                      "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background min-h-screen flex">
+<!-- Split Screen Container -->
+<main class="w-full min-h-screen flex flex-col md:flex-row overflow-hidden">
+<!-- Left Side: Branding & Illustration -->
+<section class="hidden md:flex md:w-1/2 lg:w-3/5 bg-primary overflow-hidden relative items-center justify-center p-container-padding">
+<!-- Decorative Elements -->
+<div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary-container/20 rounded-full blur-3xl"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-tertiary-container/30 rounded-full blur-3xl"></div>
+<div class="relative z-10 flex flex-col items-center text-center max-w-lg">
+<div class="mb-section-margin">
+<img alt="Antreey Brand Visual" class="rounded-[40px] shadow-2xl border-4 border-primary-container/20 aspect-video object-cover" data-alt="A professional and sleek digital dashboard visualization with minimalist charts and booking data interfaces. The scene is bathed in a soft lime green and charcoal aesthetic with glassmorphic layers that create a sense of organized efficiency. High-end office lighting illuminates a modern workstation where clean, professional software empowers business productivity. The mood is calm, tech-forward, and highly structured." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJ7bZ3DE7LRBEnvJgPTTRpzly6DmHlAxO4ZcCd0hpvaIOdtxQtm0mgsxss0kuUbbJMbVM9rCHRalj7XAOFTga1BGk3XaxBX7ECOugawQmQqR_izXgHGMeLhVbTXTtDogLVk1q2FFi07-P5yi8OZ-qYX9elBwV7UmqjsM7Rb0aafPvQ6cv2b2RVrGAI-jBmXiJh-cD9wB710ucw-eF9HeQZO15bgrB2WstsBikpBCdvDIz7WRO7FJgJO499sbKVdzyXHngoOre82jYB"/>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-primary mb-unit">Antreey</h1>
+<p class="font-body-lg text-body-lg text-primary-fixed-dim px-gutter opacity-90">
+                    Streamline your professional bookings with translucent clarity and modern precision.
+                </p>
+</div>
+</section>
+<!-- Right Side: Login Form -->
+<section class="flex-1 flex flex-col items-center justify-center p-gutter md:p-container-padding bg-surface">
+<div class="w-full max-w-[440px]">
+<!-- Mobile Logo -->
+<div class="md:hidden flex flex-col items-center mb-section-margin">
+<div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-unit">
+<span class="material-symbols-outlined text-on-primary text-3xl">calendar_today</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Antreey</h2>
+</div>
+<div class="mb-section-margin">
+<h3 class="font-headline-xl text-headline-xl text-on-surface mb-unit">Welcome back</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Please enter your details to sign in.</p>
+</div>
+<!-- Form Section -->
+<form class="space-y-gutter">
+<!-- Email Field -->
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1" for="email">Email Address</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">mail</span>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface placeholder:text-outline-variant" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant ml-1" for="password">Password</label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors">lock</span>
+<input class="w-full pl-12 pr-12 py-4 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface placeholder:text-outline-variant" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Helpers -->
+<div class="flex items-center justify-between py-unit">
+<label class="flex items-center space-x-2 cursor-pointer group">
+<input class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary bg-surface-container" type="checkbox"/>
+<span class="font-label-md text-label-md text-on-surface-variant group-hover:text-on-surface transition-colors">Remember me</span>
+</label>
+<a class="font-label-md text-label-md text-primary hover:text-on-primary-container transition-colors" href="#">Forgot password?</a>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-on-primary-container font-label-md text-label-md py-4 rounded-full shadow-md hover:shadow-lg hover:bg-inverse-primary active:scale-[0.98] transition-all duration-200 uppercase tracking-wide" type="submit">
+                        Sign In
+                    </button>
+</form>
+<!-- Divider -->
+<div class="relative my-section-margin">
+<div class="absolute inset-0 flex items-center">
+<span class="w-full border-t border-outline-variant opacity-30"></span>
+</div>
+<div class="relative flex justify-center text-label-sm text-label-sm">
+<span class="px-gutter bg-surface text-on-surface-variant">Or continue with</span>
+</div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-gutter">
+<button class="flex items-center justify-center gap-2 py-3 px-4 border border-outline-variant rounded-xl hover:bg-surface-container-low transition-colors font-label-md text-label-md text-on-surface-variant">
+<img alt="Google" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7yh-S_4vPaGw0qMwVMTkHMsr3BsqRdU1JZRGR4kPnIPcPma6dDfRceFl7T8YsqBG0lYaAq-tl5sVanS5aGzHJ3ALwhQlisDcOxF0gUtfgvCZuSvn3PKeOW_jiI8OvyHs4qBWBRIedFrVEqirwR39NI-b1Mvh8TotmQmPHYot02lQ3UEWctJ849q3zL2pNz7WcndcddV32bR6VCz0MAG3E-wZ2D7ZaWSWHcXMsDoXOQJn9eXSQjHdPuiaJZ2lCsOmU9qjy43OUvyYy"/>
+                        Google
+                    </button>
+<button class="flex items-center justify-center gap-2 py-3 px-4 border border-outline-variant rounded-xl hover:bg-surface-container-low transition-colors font-label-md text-label-md text-on-surface-variant">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">ios</span>
+                        Apple
+                    </button>
+</div>
+<!-- Footer Link -->
+<p class="mt-section-margin text-center font-body-md text-body-md text-on-surface-variant">
+                    Don't have an account? 
+                    <a class="text-primary font-label-md hover:underline decoration-2 underline-offset-4 ml-1 transition-all" href="#">Create an account</a>
+</p>
+</div>
+</section>
+</main>
+</body></html>
