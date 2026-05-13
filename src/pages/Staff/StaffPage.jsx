@@ -84,6 +84,17 @@ export const StaffPage = () => {
       setLoading(true);
       try {
         const data = await BusinessRepository.getStaff(activeBusiness.id);
+        await Promise.all(
+          data
+            .filter((member) => member.userId)
+            .map((member) => BusinessRepository.upsertBusinessMember(activeBusiness.id, member.userId, {
+              roleInBusiness: 'staff',
+              status: 'active',
+              name: member.name || '',
+              email: member.email || '',
+              staffDocId: member.id
+            }))
+        );
         setStaff(data);
       } finally {
         setLoading(false);
@@ -179,7 +190,7 @@ export const StaffPage = () => {
     if (!editingStaff?.id && selectedUser) {
       const alreadyExists = staff.some((member) => (member.userId || member.id) === selectedUser.id);
       if (alreadyExists) {
-        toast.error('Staff ini sudah terdaftar di bisnis ini.');
+        toast.error('This staff member is already assigned to this business.');
         return;
       }
     }
@@ -200,8 +211,24 @@ export const StaffPage = () => {
 
     if (editingStaff?.id) {
       await BusinessRepository.updateStaff(activeBusiness.id, editingStaff.id, payload);
+      if (payload.userId) {
+        await BusinessRepository.upsertBusinessMember(activeBusiness.id, payload.userId, {
+          roleInBusiness: 'staff',
+          status: 'active',
+          name: payload.name,
+          email: selectedUser?.email || editingStaff?.email || '',
+          staffDocId: editingStaff.id
+        });
+      }
     } else {
-      await BusinessRepository.addStaff(activeBusiness.id, payload);
+      const createdStaff = await BusinessRepository.addStaff(activeBusiness.id, payload);
+      await BusinessRepository.upsertBusinessMember(activeBusiness.id, payload.userId, {
+        roleInBusiness: 'staff',
+        status: 'active',
+        name: payload.name,
+        email: selectedUser?.email || '',
+        staffDocId: createdStaff.id
+      });
     }
 
     const data = await BusinessRepository.getStaff(activeBusiness.id);
@@ -250,7 +277,7 @@ export const StaffPage = () => {
                 </select>
                 {availableCandidates.length === 0 && (
                   <p className="text-xs text-on-surface-variant">
-                    Semua user staff untuk bisnis aktif sudah ditambahkan.
+                    All staff users for the active business have already been added.
                   </p>
                 )}
               </>

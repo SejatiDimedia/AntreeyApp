@@ -56,7 +56,17 @@ export function BusinessProvider({ children }) {
 
     if (role === 'staff') {
       setLoading(true);
-      BusinessRepository.getBusinessesForCustomer(currentUser.uid)
+      Promise.all([
+        BusinessRepository.getBusinessesForMember(currentUser.uid).catch(() => []),
+        BusinessRepository.getBusinessesForCustomer(currentUser.uid).catch(() => [])
+      ])
+        .then(([memberBusinesses, customerBusinesses]) => {
+          const businessMap = new Map();
+          [...memberBusinesses, ...customerBusinesses].forEach((business) => {
+            if (business?.id) businessMap.set(business.id, business);
+          });
+          return Array.from(businessMap.values());
+        })
         .then((businessList) => {
           if (cancelled) return;
           setBusinesses(businessList);

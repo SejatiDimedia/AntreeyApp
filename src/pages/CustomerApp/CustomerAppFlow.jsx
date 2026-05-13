@@ -86,9 +86,9 @@ export const CustomerAppFlow = () => {
           role: userProfile?.role || 'customer'
         });
         if (errorCode === 'permission-denied') {
-          setLoadError(`Akses ditolak (${errorCode}). ${errorMessage}`);
+          setLoadError(`Access denied (${errorCode}). ${errorMessage}`);
         } else {
-          setLoadError(`Gagal memuat data bisnis/service (${errorCode}): ${errorMessage}`);
+          setLoadError(`Failed to load business/service data (${errorCode}): ${errorMessage}`);
         }
         setBusiness(null);
         setServices([]);
@@ -120,7 +120,7 @@ export const CustomerAppFlow = () => {
         setServices(servicesData);
       } catch (error) {
         if (error?.code === 'permission-denied') {
-          setLoadError('Akses ditolak. Customer belum punya izin baca data bisnis ini.');
+          setLoadError('Access denied. This customer does not have permission to read this business yet.');
         }
       }
     }

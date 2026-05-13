@@ -118,4 +118,5 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **DP / Payment Proof Flow**: Customer can upload payment proof image via Cloudinary and submit to booking (`paymentProofUrl`, `paymentStatus`, `paymentProofSubmittedAt`).
 - [x] **Owner Payment Review Flow**: Owner can review proof image from bookings page and approve/reject payment to update booking status.
 - [x] **Customer Payment Status UX**: `My Bookings` now shows clear one-line badge for proof submitted state (`Proof Sent · Waiting Review`).
+- [x] **Operational Notification Center**: Business-scoped notifications now track booking/payment events with unread badge and topbar dropdown for owner/staff.
 - [ ] **Hard Transaction Locking**: Move critical conflict validation into Firestore transaction/cloud function for race-condition proofing.

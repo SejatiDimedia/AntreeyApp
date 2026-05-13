@@ -12,6 +12,7 @@ export const BookingTable = ({
   onCreateWalkIn,
   onOpenCheckIn,
   onReviewPayment,
+  onOpenDetail,
   queueConfig = {}
 }) => {
   const renderStatus = (status, paymentStatus) => {
@@ -131,7 +132,11 @@ export const BookingTable = ({
         {bookings.length === 0 ? (
           <div className="p-6 text-center text-on-surface-variant opacity-60">No upcoming reservations found</div>
         ) : bookings.map((booking) => (
-          <div key={booking.id} className="rounded-2xl border border-outline-variant/20 p-4 bg-white/60">
+          <div
+            key={booking.id}
+            onClick={() => onOpenDetail?.(booking)}
+            className="rounded-2xl border border-outline-variant/20 p-4 bg-white/60 cursor-pointer hover:border-primary/30 hover:shadow-sm transition-all"
+          >
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="font-semibold text-on-surface">{booking.customerName || 'Anonymous'}</p>
@@ -146,9 +151,9 @@ export const BookingTable = ({
               <p><span className="text-on-surface-variant">Staff:</span> {booking.staffName || 'Any Staff'}</p>
               <p className="col-span-2"><span className="text-on-surface-variant">Service:</span> {booking.serviceName || 'Service'}</p>
             </div>
-            <div className="mt-3 flex items-center justify-between">
+            <div className="mt-3 flex items-center justify-between gap-3">
               <div>{renderStatus(booking.status, booking.paymentStatus)}</div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-wrap justify-end" onClick={(event) => event.stopPropagation()}>
                 {booking.status === 'pending' && (
                   <button
                     onClick={() => onCallNext(booking.id)}
@@ -221,7 +226,11 @@ export const BookingTable = ({
                 </td>
               </tr>
             ) : bookings.map((booking) => (
-              <tr key={booking.id} className="hover:bg-surface-container-high/40 transition-colors">
+              <tr
+                key={booking.id}
+                onClick={() => onOpenDetail?.(booking)}
+                className="hover:bg-surface-container-high/40 transition-colors cursor-pointer"
+              >
                 <td className="px-5 py-4 align-middle">
                   <div className={`font-semibold text-[16px] ${booking.status === 'confirmed' ? 'text-primary' : 'text-on-surface'}`}>{booking.timeSlot || '--:--'}</div>
                   <div className="text-xs text-on-surface-variant mt-0.5">{booking.duration || '30 mins'}</div>
@@ -255,7 +264,7 @@ export const BookingTable = ({
                 <td className="px-5 py-4 align-middle">
                   {renderStatus(booking.status, booking.paymentStatus)}
                 </td>
-                <td className="px-5 py-4 align-middle text-right">
+                <td className="px-5 py-4 align-middle text-right" onClick={(event) => event.stopPropagation()}>
                   <div className="flex items-center justify-end gap-2">
                     {booking.status === 'pending' && (
                       <button

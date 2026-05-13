@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { SettingsNav } from './components/SettingsNav';
 import { BusinessProfile } from './components/BusinessProfile';
-import { OperatingHours } from './components/OperatingHours';
+import { DEFAULT_OPERATING_HOURS, OperatingHours, normalizeOperatingHours } from './components/OperatingHours';
 import { NotificationPreferences } from './components/NotificationPreferences';
 import { useBusiness } from '../../context/BusinessContext';
 import { BusinessRepository } from '../../repositories';
@@ -14,9 +14,12 @@ export const SettingsPage = () => {
     name: '',
     category: '',
     description: '',
+    logoUrl: '',
+    coverImageUrl: '',
     queuePrefix: 'A',
     queuePadLength: 1,
     queuePadLengthInput: '1',
+    operatingHours: DEFAULT_OPERATING_HOURS,
     paymentMethods: []
   });
 
@@ -26,9 +29,12 @@ export const SettingsPage = () => {
       name: activeBusiness.name || '',
       category: activeBusiness.category || '',
       description: activeBusiness.description || '',
+      logoUrl: activeBusiness.logoUrl || activeBusiness.logo || '',
+      coverImageUrl: activeBusiness.coverImageUrl || activeBusiness.bannerUrl || activeBusiness.imageUrl || '',
       queuePrefix: activeBusiness.queuePrefix || 'A',
       queuePadLength: Number(activeBusiness.queuePadLength || 1),
       queuePadLengthInput: String(activeBusiness.queuePadLength || 1),
+      operatingHours: normalizeOperatingHours(activeBusiness.operatingHours),
       paymentMethods: Array.isArray(activeBusiness.paymentMethods) ? activeBusiness.paymentMethods : []
     });
   }, [activeBusiness]);
@@ -64,7 +70,7 @@ export const SettingsPage = () => {
       {/* Configuration Form Area */}
       <div className="col-span-12 lg:col-span-9 space-y-card-gap">
         <BusinessProfile formData={formData} onChange={handleFieldChange} />
-        <OperatingHours />
+        <OperatingHours value={formData.operatingHours} onChange={(value) => handleFieldChange('operatingHours', value)} />
         <NotificationPreferences />
 
         {/* Save Banner */}

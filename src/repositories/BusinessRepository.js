@@ -5,6 +5,7 @@ import {
   doc, 
   getDoc, 
   addDoc,
+  setDoc,
   getDocs,
   query,
   where,
@@ -96,6 +97,31 @@ export const BusinessRepository = {
     }
   },
 
+  async getBusinessesForMember(userId) {
+    try {
+      if (!userId) return [];
+      const q = query(
+        collectionGroup(db, 'members'),
+        where('userId', '==', userId)
+      );
+      const membershipSnapshot = await getDocs(q);
+      if (membershipSnapshot.empty) return [];
+
+      const businessIds = membershipSnapshot.docs
+        .map((memberDoc) => memberDoc.ref.parent.parent?.id)
+        .filter(Boolean);
+
+      const uniqueIds = Array.from(new Set(businessIds));
+      const businesses = await Promise.all(uniqueIds.map((id) => this.getBusiness(id)));
+      return businesses.filter(Boolean);
+    } catch (error) {
+      if (!isPermissionDenied(error)) {
+        console.error('Error getting businesses for member:', error);
+      }
+      throw error;
+    }
+  },
+
   /**
    * Get all services for a business
    */
@@ -172,6 +198,24 @@ export const BusinessRepository = {
       return { id: docRef.id, ...staffData };
     } catch (error) {
       console.error('Error adding staff:', error);
+      throw error;
+    }
+  },
+
+  async upsertBusinessMember(businessId, userId, memberData = {}) {
+    try {
+      if (!businessId || !userId) return { success: false };
+      const memberRef = doc(db, `${BUSINESSES_COLLECTION}/${businessId}/members`, userId);
+      await setDoc(memberRef, {
+        userId,
+        status: 'active',
+        roleInBusiness: 'staff',
+        updatedAt: new Date().toISOString(),
+        ...memberData
+      }, { merge: true });
+      return { success: true };
+    } catch (error) {
+      console.error('Error upserting business member:', error);
       throw error;
     }
   },

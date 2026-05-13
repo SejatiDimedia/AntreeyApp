@@ -218,9 +218,9 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
     } catch (error) {
       console.error('Error creating booking:', error);
       if (error?.code === 'booking/conflict') {
-        setSubmitError('Kamu sudah punya booking di tanggal dan jam ini. Pilih waktu lain ya.');
+        setSubmitError('You already have a booking at this date and time. Please choose another slot.');
       } else {
-        setSubmitError(`Booking gagal (${error?.code || 'unknown'}). Coba lagi dalam beberapa saat.`);
+        setSubmitError(`Booking failed (${error?.code || 'unknown'}). Please try again shortly.`);
       }
     } finally {
       setLoading(false);
@@ -313,7 +313,7 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
             )})}
           </div>
           <p className="text-[12px] text-on-surface-variant mt-2">
-            Kamu bisa booking hingga 7 hari ke depan. Jam yang sudah lewat hanya dinonaktifkan untuk hari ini.
+            You can book up to 7 days ahead. Past time slots are disabled only for today.
           </p>
         </div>
 
@@ -367,7 +367,7 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
           <div className="mb-3 rounded-2xl border border-error/30 bg-error-container/70 text-on-error-container px-4 py-3 flex items-start gap-2">
             <span className="material-symbols-outlined text-[20px] mt-[1px]">error</span>
             <div>
-              <p className="text-sm font-semibold">Booking belum berhasil</p>
+              <p className="text-sm font-semibold">Booking was not completed</p>
               <p className="text-xs opacity-90">{submitError}</p>
             </div>
           </div>

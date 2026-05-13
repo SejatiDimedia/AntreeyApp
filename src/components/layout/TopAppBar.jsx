@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useBusiness } from '../../context/BusinessContext';
-import { BusinessRepository } from '../../repositories';
+import { BusinessRepository, NotificationRepository } from '../../repositories';
 
 export const TopAppBar = ({ title, activeCount }) => {
+  const navigate = useNavigate();
   const { currentUser, userProfile, role, logout } = useAuth();
   const { businesses, activeBusinessId, selectBusiness } = useBusiness();
   const showBusinessSwitcher = (role === 'owner' || role === 'admin' || role === 'staff') && businesses.length > 0;
@@ -17,9 +19,27 @@ export const TopAppBar = ({ title, activeCount }) => {
     phone: '',
     address: ''
   });
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const displayName = userProfile?.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'User';
   const displayRole = (role || 'customer').charAt(0).toUpperCase() + (role || 'customer').slice(1);
   const displayEmail = userProfile?.email || currentUser?.email || '-';
+  const unreadCount = notifications.filter((item) => !item.read).length;
+
+  useEffect(() => {
+    if (!activeBusinessId || !(role === 'owner' || role === 'admin' || role === 'staff')) {
+      setNotifications([]);
+      return undefined;
+    }
+    return NotificationRepository.subscribeToBusinessNotifications(activeBusinessId, setNotifications);
+  }, [activeBusinessId, role]);
+
+  const formatNotificationTime = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleString('en-US', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+  };
 
   const handleLogout = async () => {
     try {
@@ -75,9 +95,59 @@ export const TopAppBar = ({ title, activeCount }) => {
             </div>
 
             <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-              <button className="p-2 hover:bg-surface-container-highest/50 rounded-full transition-all text-on-surface-variant">
-                <span className="material-symbols-outlined">notifications</span>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                  className="relative p-2 hover:bg-surface-container-highest/50 rounded-full transition-all text-on-surface-variant"
+                >
+                  <span className="material-symbols-outlined">notifications</span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-error text-white text-[10px] font-bold flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {isNotificationsOpen && (
+                  <div className="absolute right-0 mt-2 w-[min(360px,calc(100vw-32px))] bg-white rounded-2xl shadow-2xl border border-outline-variant/20 z-[80] overflow-hidden">
+                    <div className="px-4 py-3 border-b border-outline-variant/20 flex items-center justify-between">
+                      <p className="font-semibold text-on-surface">Notifications</p>
+                      <span className="text-xs text-on-surface-variant">{unreadCount} unread</span>
+                    </div>
+                    <div className="max-h-96 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-sm text-on-surface-variant">No notifications yet.</div>
+                      ) : notifications.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              if (!item.read) await NotificationRepository.markAsRead(activeBusinessId, item.id);
+                            } catch (error) {
+                              console.error('Mark notification read failed:', error);
+                            }
+                            setIsNotificationsOpen(false);
+                            navigate('/bookings');
+                          }}
+                          className={`w-full text-left px-4 py-3 border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors ${item.read ? 'bg-white' : 'bg-primary-container/10'}`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className={`material-symbols-outlined text-[20px] mt-0.5 ${item.read ? 'text-on-surface-variant' : 'text-primary'}`}>
+                              {item.type?.includes('payment') ? 'payments' : item.type?.includes('cancel') ? 'event_busy' : 'event_note'}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-semibold text-on-surface truncate">{item.title || 'Notification'}</p>
+                              <p className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">{item.message || '-'}</p>
+                              <p className="text-[11px] text-on-surface-variant mt-1">{formatNotificationTime(item.createdAt)}</p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-outline-variant/30">
                 <div className="text-right hidden md:block">

@@ -11,6 +11,7 @@ import {
   orderBy,
   deleteDoc
 } from 'firebase/firestore';
+import { NotificationRepository } from './NotificationRepository';
 
 const BOOKINGS_COLLECTION = 'bookings';
 const toMinutes = (hhmm) => {
@@ -60,6 +61,14 @@ const hasSharedConstraint = (incoming, existing) => {
     existingStaff === 'any';
 
   return sameService || sameResource || sameSpecificStaff || noExplicitConstraint;
+};
+
+const notifyBusiness = async (businessId, payload) => {
+  try {
+    await NotificationRepository.createBusinessNotification(businessId, payload);
+  } catch {
+    // Notifications should never block the primary booking workflow.
+  }
 };
 
 export const BookingRepository = {
@@ -116,6 +125,15 @@ export const BookingRepository = {
         createdAt: new Date().toISOString(),
         status: bookingData.status || 'pending' // pending, awaiting_payment, confirmed, completed, cancelled
       });
+      await notifyBusiness(businessId, {
+        type: bookingData.type === 'walkin' ? 'walkin_created' : 'booking_created',
+        title: bookingData.type === 'walkin' ? 'Walk-in booking created' : 'New booking created',
+        message: `${bookingData.customerName || 'Customer'} booked ${bookingData.serviceName || 'a service'} at ${timeSlotValue || '--:--'}.`,
+        bookingId: docRef.id,
+        date: dateValue,
+        actorId: bookingData.customerId || bookingData.userId || '',
+        actorName: bookingData.customerName || ''
+      });
       return { id: docRef.id, ...bookingData, queuePosition };
     } catch (error) {
       console.error('Error creating booking:', error);
@@ -141,6 +159,12 @@ export const BookingRepository = {
       if (status === 'in_progress') payload.startedAt = new Date().toISOString();
       if (status === 'completed') payload.completedAt = new Date().toISOString();
       await updateDoc(bookingRef, payload);
+      await notifyBusiness(businessId, {
+        type: `booking_${status}`,
+        title: 'Booking status updated',
+        message: `Booking moved to ${String(status || '').replaceAll('_', ' ')}.`,
+        bookingId
+      });
       return { success: true };
     } catch (error) {
       console.error('Error updating booking status:', error);
@@ -155,6 +179,13 @@ export const BookingRepository = {
         paymentProofNote: payload.paymentProofNote || '',
         paymentStatus: 'proof_submitted',
         paymentProofSubmittedAt: new Date().toISOString()
+      });
+      await notifyBusiness(businessId, {
+        type: 'payment_proof_submitted',
+        title: 'Payment proof waiting review',
+        message: 'A customer uploaded payment proof for review.',
+        bookingId,
+        actorName: payload.customerName || ''
       });
       return { success: true };
     } catch (error) {
@@ -181,6 +212,14 @@ export const BookingRepository = {
         payload.status = 'awaiting_payment';
       }
       await updateDoc(bookingRef, payload);
+      await notifyBusiness(businessId, {
+        type: normalized === 'approve' ? 'payment_approved' : 'payment_rejected',
+        title: normalized === 'approve' ? 'Payment approved' : 'Payment rejected',
+        message: `${reviewer.name || reviewer.email || 'Staff'} ${normalized === 'approve' ? 'approved' : 'rejected'} a payment proof.`,
+        bookingId,
+        actorId: reviewer.uid || '',
+        actorName: reviewer.name || reviewer.email || ''
+      });
       return { success: true };
     } catch (error) {
       console.error('Error reviewing payment proof:', error);

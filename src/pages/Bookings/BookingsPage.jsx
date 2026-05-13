@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookingFilters } from './components/BookingFilters';
 import { BookingTable } from './components/BookingTable';
+import { BookingDetailDrawer } from './components/BookingDetailDrawer';
 import { CalendarCard } from './components/CalendarCard';
 import { WeeklyChart } from './components/WeeklyChart';
 import { Promotions } from './components/Promotions';
@@ -50,6 +51,7 @@ export const BookingsPage = () => {
   const [checkInSubmitting, setCheckInSubmitting] = useState(false);
   const [scannerActive, setScannerActive] = useState(false);
   const [scannerSupported, setScannerSupported] = useState(true);
+  const [detailBookingId, setDetailBookingId] = useState('');
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const scanIntervalRef = useRef(null);
@@ -155,7 +157,7 @@ export const BookingsPage = () => {
         bookingId,
         action,
         title: 'Cancel Booking?',
-        message: 'Booking akan diubah ke status cancelled. Aksi ini bisa mempengaruhi antrian aktif.'
+        message: 'This booking will be marked as cancelled. This may affect the active queue.'
       });
       return;
     }
@@ -164,7 +166,7 @@ export const BookingsPage = () => {
       bookingId,
       action,
       title: 'Delete Booking Permanently?',
-      message: 'Data booking akan dihapus permanen dan tidak bisa dikembalikan.'
+      message: 'This booking will be permanently deleted and cannot be restored.'
     });
   };
 
@@ -253,7 +255,7 @@ export const BookingsPage = () => {
     const timeSlot = walkInForm.timeSlot;
     const durationMinutes = Number(walkInForm.durationMinutes || 30);
     if (!customerName || !serviceName || !date || !timeSlot || Number.isNaN(durationMinutes) || durationMinutes <= 0) {
-      toast.error('Lengkapi data walk-in terlebih dahulu.');
+      toast.error('Please complete the walk-in details first.');
       return;
     }
     setWalkInSubmitting(true);
@@ -271,13 +273,13 @@ export const BookingsPage = () => {
         timeSlot,
         durationMinutes
       });
-      toast.success('Walk-in booking berhasil dibuat.');
+      toast.success('Walk-in booking created successfully.');
       setWalkInModalOpen(false);
     } catch (error) {
       if (error?.code === 'booking/conflict') {
-        toast.error('Waktu bentrok dengan booking lain.');
+        toast.error('This time conflicts with another booking.');
       } else {
-        toast.error('Gagal membuat walk-in booking.');
+        toast.error('Failed to create walk-in booking.');
       }
     } finally {
       setWalkInSubmitting(false);
@@ -288,20 +290,20 @@ export const BookingsPage = () => {
     if (!activeBusiness?.id) return;
     const code = checkInCode.trim();
     if (!code) {
-      toast.error('Masukkan kode booking dulu.');
+      toast.error('Please enter the booking code first.');
       return;
     }
     setCheckInSubmitting(true);
     try {
       await BookingRepository.checkInByCode(activeBusiness.id, selectedDate, code);
-      toast.success('Customer berhasil check-in.');
+      toast.success('Customer checked in successfully.');
       setCheckInModalOpen(false);
       setCheckInCode('');
     } catch (error) {
       if (error?.code === 'booking/not-found') {
-        toast.error('Kode booking tidak ditemukan untuk tanggal ini.');
+        toast.error('Booking code was not found for this date.');
       } else {
-        toast.error('Gagal check-in. Coba lagi.');
+        toast.error('Check-in failed. Please try again.');
       }
     } finally {
       setCheckInSubmitting(false);
@@ -325,7 +327,7 @@ export const BookingsPage = () => {
       const hasBarcodeDetector = typeof window !== 'undefined' && 'BarcodeDetector' in window;
       if (!hasBarcodeDetector) {
         setScannerSupported(false);
-        toast.error('Scanner tidak didukung browser ini. Gunakan input kode manual.');
+        toast.error('Scanner is not supported in this browser. Please enter the code manually.');
         return;
       }
       const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
@@ -345,7 +347,7 @@ export const BookingsPage = () => {
             if (!rawValue) return;
             const parsed = rawValue.includes(':') ? rawValue.split(':').pop().trim() : rawValue;
             setCheckInCode(parsed.slice(0, 8));
-            toast.success('Kode booking terdeteksi.');
+            toast.success('Booking code detected.');
             stopScanner();
           }
         } catch {
@@ -354,7 +356,7 @@ export const BookingsPage = () => {
       }, 700);
     } catch (error) {
       console.error('Start scanner failed:', error);
-      toast.error('Tidak bisa mengakses kamera.');
+      toast.error('Unable to access the camera.');
       stopScanner();
     }
   };
@@ -376,6 +378,10 @@ export const BookingsPage = () => {
     String(item.paymentStatus || '').toLowerCase() === 'proof_submitted';
 
   const waitingReviewCount = bookings.filter((item) => item.date === selectedDate && isWaitingReview(item)).length;
+  const queueConfig = {
+    prefix: activeBusiness?.queuePrefix || 'A',
+    padLength: Number(activeBusiness?.queuePadLength || 1)
+  };
 
   const filteredBookings = bookings
     .filter((item) => item.date === selectedDate)
@@ -391,6 +397,7 @@ export const BookingsPage = () => {
       if (aQueue > 0 && bQueue > 0) return aQueue - bQueue;
       return String(a.timeSlot || '').localeCompare(String(b.timeSlot || ''));
     });
+  const detailBooking = bookings.find((item) => item.id === detailBookingId) || null;
 
   if (businessLoading || loading) {
     return (
@@ -439,10 +446,8 @@ export const BookingsPage = () => {
               setCheckInModalOpen(true);
             }}
             onReviewPayment={openPaymentReview}
-            queueConfig={{
-              prefix: activeBusiness?.queuePrefix || 'A',
-              padLength: Number(activeBusiness?.queuePadLength || 1)
-            }}
+            onOpenDetail={(booking) => setDetailBookingId(booking.id)}
+            queueConfig={queueConfig}
           />
         </div>
         
@@ -471,14 +476,30 @@ export const BookingsPage = () => {
       
       <Promotions />
 
+      <BookingDetailDrawer
+        open={Boolean(detailBooking)}
+        booking={detailBooking}
+        onClose={() => setDetailBookingId('')}
+        onCallNext={handleCallNext}
+        onStartService={handleStartService}
+        onCompleteBooking={handleCompleteBooking}
+        onCancelBooking={(id) => openConfirm(id, 'cancel')}
+        onDeleteBooking={(id) => openConfirm(id, 'delete')}
+        onReviewPayment={(booking) => {
+          setDetailBookingId('');
+          openPaymentReview(booking);
+        }}
+        queueConfig={queueConfig}
+      />
+
       {walkInModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => !walkInSubmitting && setWalkInModalOpen(false)} />
           <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-outline-variant/20 overflow-hidden">
             <div className="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between bg-primary/5">
               <div>
                 <h3 className="font-headline-lg-mobile text-[22px] text-on-surface">Add Walk-in Booking</h3>
-                <p className="text-sm text-on-surface-variant">Masukkan customer yang datang langsung ke toko.</p>
+                <p className="text-sm text-on-surface-variant">Add a customer who arrives directly at the store.</p>
               </div>
               <button
                 onClick={() => !walkInSubmitting && setWalkInModalOpen(false)}
@@ -507,7 +528,7 @@ export const BookingsPage = () => {
                     }));
                   }}
                 >
-                  <option value="">Pilih service</option>
+                  <option value="">Select service</option>
                   {services.map((service) => (
                     <option key={service.id} value={service.id}>
                       {(service.name || service.title || 'Service')} - {Number(service.durationMinutes || service.duration || 30)}m
@@ -560,7 +581,7 @@ export const BookingsPage = () => {
             <div className="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between bg-secondary-container/30">
               <div>
                 <h3 className="font-headline-lg-mobile text-[22px] text-on-surface">Check-in Booking</h3>
-                <p className="text-sm text-on-surface-variant">Input kode tiket dari customer (contoh: 8 karakter awal ID).</p>
+                <p className="text-sm text-on-surface-variant">Enter the ticket code from the customer (for example, the first 8 ID characters).</p>
               </div>
               <button
                 onClick={() => !checkInSubmitting && setCheckInModalOpen(false)}
@@ -595,7 +616,7 @@ export const BookingsPage = () => {
                   <video ref={videoRef} className={`w-full h-full object-cover ${scannerActive ? 'block' : 'hidden'}`} muted playsInline />
                   {!scannerActive && (
                     <p className="text-xs text-white/80 px-4 text-center">
-                      {scannerSupported ? 'Klik Start Scan untuk buka kamera.' : 'Scanner tidak didukung di browser ini.'}
+                      {scannerSupported ? 'Click Start Scan to open the camera.' : 'Scanner is not supported in this browser.'}
                     </p>
                   )}
                 </div>
@@ -651,7 +672,7 @@ export const BookingsPage = () => {
       )}
 
       {reviewModal.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/40" onClick={() => !reviewModal.submitting && setReviewModal({ open: false, booking: null, note: '', submitting: false })} />
           <div className="relative w-full max-w-lg bg-white rounded-3xl border border-outline-variant/20 shadow-2xl overflow-hidden">
             <div className="px-6 py-5 border-b border-outline-variant/20 bg-blue-50">

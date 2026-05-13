@@ -85,7 +85,7 @@ export const QueueTvPage = () => {
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Queue TV</h1>
-          <p className="text-slate-300">Pilih bisnis aktif terlebih dahulu dari halaman dashboard/bookings.</p>
+          <p className="text-slate-300">Please select an active business first from the dashboard or bookings page.</p>
         </div>
       </div>
     );
