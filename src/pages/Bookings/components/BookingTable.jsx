@@ -14,7 +14,34 @@ export const BookingTable = ({
   onReviewPayment,
   queueConfig = {}
 }) => {
-  const renderStatus = (status) => {
+  const renderStatus = (status, paymentStatus) => {
+    if (paymentStatus === 'approved') {
+      return (
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-emerald-700">
+          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+          <span className="font-label-md">Payment Approved</span>
+        </span>
+      );
+    }
+
+    if (paymentStatus === 'rejected') {
+      return (
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-rose-700">
+          <span className="material-symbols-outlined text-[18px]">report</span>
+          <span className="font-label-md">Payment Rejected</span>
+        </span>
+      );
+    }
+
+    if (status === 'awaiting_payment' && paymentStatus === 'proof_submitted') {
+      return (
+        <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-blue-700">
+          <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+          <span className="font-label-md">Proof Sent</span>
+        </span>
+      );
+    }
+
     switch (status) {
       case 'confirmed':
       case 'Confirmed':
@@ -120,7 +147,7 @@ export const BookingTable = ({
               <p className="col-span-2"><span className="text-on-surface-variant">Service:</span> {booking.serviceName || 'Service'}</p>
             </div>
             <div className="mt-3 flex items-center justify-between">
-              <div>{renderStatus(booking.status)}</div>
+              <div>{renderStatus(booking.status, booking.paymentStatus)}</div>
               <div className="flex items-center gap-1">
                 {booking.status === 'pending' && (
                   <button
@@ -146,12 +173,12 @@ export const BookingTable = ({
                     <span className="material-symbols-outlined text-[14px]">task_alt</span> Complete
                   </button>
                 )}
-                {booking.status === 'awaiting_payment' && booking.paymentStatus === 'proof_submitted' && (
+                {booking.paymentProofUrl && (
                   <button
                     onClick={() => onReviewPayment?.(booking)}
                     className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-semibold"
                   >
-                    <span className="material-symbols-outlined text-[14px]">receipt_long</span> Review
+                    <span className="material-symbols-outlined text-[14px]">receipt_long</span> {booking.paymentStatus === 'proof_submitted' ? 'Review' : 'Proof'}
                   </button>
                 )}
                 {booking.status !== 'cancelled' && booking.status !== 'completed' && (
@@ -226,7 +253,7 @@ export const BookingTable = ({
                   <div className="bg-secondary-container/50 px-3 py-1 rounded-full inline-block text-xs font-semibold whitespace-nowrap">{booking.staffName || 'Any Staff'}</div>
                 </td>
                 <td className="px-5 py-4 align-middle">
-                  {renderStatus(booking.status)}
+                  {renderStatus(booking.status, booking.paymentStatus)}
                 </td>
                 <td className="px-5 py-4 align-middle text-right">
                   <div className="flex items-center justify-end gap-2">
@@ -254,12 +281,12 @@ export const BookingTable = ({
                         <span className="material-symbols-outlined text-[14px]">task_alt</span> Complete
                       </button>
                     )}
-                    {booking.status === 'awaiting_payment' && booking.paymentStatus === 'proof_submitted' && (
+                    {booking.paymentProofUrl && (
                       <button
                         onClick={() => onReviewPayment?.(booking)}
                         className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full text-xs font-semibold"
                       >
-                        <span className="material-symbols-outlined text-[14px]">receipt_long</span> Review
+                        <span className="material-symbols-outlined text-[14px]">receipt_long</span> {booking.paymentStatus === 'proof_submitted' ? 'Review' : 'Proof'}
                       </button>
                     )}
                     {booking.status !== 'cancelled' && booking.status !== 'completed' && (

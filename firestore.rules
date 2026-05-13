@@ -39,6 +39,11 @@ service cloud.firestore {
         && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
           || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'owner');
     }
+    function isGlobalStaff() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'staff';
+    }
 
     function roleInBusiness(businessId) {
       return get(membershipPath(businessId, request.auth.uid)).data.roleInBusiness;
@@ -47,6 +52,25 @@ service cloud.firestore {
     function isBusinessManager(businessId) {
       return hasActiveMembership(businessId)
         && (roleInBusiness(businessId) == 'owner' || roleInBusiness(businessId) == 'admin');
+    }
+    function isBusinessStaff(businessId) {
+      return hasActiveMembership(businessId)
+        && roleInBusiness(businessId) == 'staff';
+    }
+    function isCustomerStaff(businessId) {
+      return hasCustomerMembership(businessId)
+        && (
+          get(customerPath(businessId, request.auth.uid)).data.roleInBusiness == 'staff'
+          || get(customerPath(businessId, request.auth.uid)).data.role == 'staff'
+        );
+    }
+    function canOperateBookings(businessId) {
+      return isBusinessManager(businessId)
+        || isBusinessStaff(businessId)
+        || isCustomerStaff(businessId)
+        || (isGlobalStaff() && canAccessBusiness(businessId))
+        || isGlobalAdmin()
+        || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
     }
     function isBookingOwnerUpdate(businessId) {
       return (
@@ -112,13 +136,13 @@ service cloud.firestore {
             || request.resource.data.userId == request.auth.uid
           );
 
-        allow update: if isBusinessManager(businessId)
+        allow update: if canOperateBookings(businessId)
           || (
             isSignedIn()
             && isPaymentProofUpdateOnly()
           );
 
-        allow delete: if isBusinessManager(businessId);
+        allow delete: if canOperateBookings(businessId);
       }
     }
   }

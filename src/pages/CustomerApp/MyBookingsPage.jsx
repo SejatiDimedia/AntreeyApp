@@ -49,6 +49,9 @@ export const MyBookingsPage = ({ businessId, onBack, onOpenTicket, queueConfig =
     const paymentStatus = String(item.paymentStatus || '').toLowerCase();
 
     if (status === 'awaiting_payment') {
+      if (paymentStatus === 'rejected') {
+        return <span className="text-xs whitespace-nowrap px-2.5 py-1 rounded-full bg-rose-100 text-rose-700">Payment Needs Revision</span>;
+      }
       if (paymentStatus === 'proof_submitted') {
         return <span className="text-xs whitespace-nowrap px-2.5 py-1 rounded-full bg-blue-100 text-blue-700">Proof Sent · Waiting Review</span>;
       }
@@ -141,8 +144,19 @@ export const MyBookingsPage = ({ businessId, onBack, onOpenTicket, queueConfig =
             <p className="text-sm text-on-surface-variant">Queue: {formatQueueNumber(item.queuePosition, queueConfig)}</p>
 
             {item.status === 'awaiting_payment' && (
-              <div className="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs">
-                Complete your deposit payment to secure this booking slot.
+              <div className={`mt-3 p-3 rounded-xl border text-xs ${
+                item.paymentStatus === 'rejected'
+                  ? 'bg-rose-50 border-rose-200 text-rose-800'
+                  : 'bg-amber-50 border-amber-200 text-amber-800'
+              }`}>
+                {item.paymentStatus === 'rejected'
+                  ? 'Your payment proof needs revision. Please upload a clearer or corrected proof.'
+                  : 'Complete your deposit payment to secure this booking slot.'}
+                {item.paymentStatus === 'rejected' && item.paymentReviewNote ? (
+                  <p className="mt-2 rounded-lg bg-white/70 px-2 py-1 text-[11px]">
+                    Note: {item.paymentReviewNote}
+                  </p>
+                ) : null}
               </div>
             )}
 

@@ -162,12 +162,15 @@ export const BookingRepository = {
       throw error;
     }
   },
-  async reviewPaymentProof(businessId, bookingId, decision = 'approve', note = '') {
+  async reviewPaymentProof(businessId, bookingId, decision = 'approve', note = '', reviewer = {}) {
     try {
       const bookingRef = doc(db, `businesses/${businessId}/bookings`, bookingId);
       const normalized = String(decision || '').toLowerCase();
       const payload = {
         paymentReviewedAt: new Date().toISOString(),
+        paymentReviewedBy: reviewer.uid || '',
+        paymentReviewedByName: reviewer.name || reviewer.email || 'Reviewer',
+        paymentReviewDecision: normalized === 'approve' ? 'approved' : 'rejected',
         paymentReviewNote: note || ''
       };
       if (normalized === 'approve') {

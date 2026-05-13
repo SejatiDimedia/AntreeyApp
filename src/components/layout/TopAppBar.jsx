@@ -6,7 +6,7 @@ import { BusinessRepository } from '../../repositories';
 export const TopAppBar = ({ title, activeCount }) => {
   const { currentUser, userProfile, role, logout } = useAuth();
   const { businesses, activeBusinessId, selectBusiness } = useBusiness();
-  const showBusinessSwitcher = (role === 'owner' || role === 'admin') && businesses.length > 0;
+  const showBusinessSwitcher = (role === 'owner' || role === 'admin' || role === 'staff') && businesses.length > 0;
   const canCreateBusiness = role === 'owner';
 
   const [isCreateBusinessOpen, setIsCreateBusinessOpen] = useState(false);

@@ -8,6 +8,7 @@ import { Promotions } from './components/Promotions';
 import { useBusiness } from '../../context/BusinessContext';
 import { BookingRepository } from '../../repositories/BookingRepository';
 import { BusinessRepository } from '../../repositories/BusinessRepository';
+import { useAuth } from '../../context/AuthContext';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -19,8 +20,22 @@ const getTodayDateKey = () => {
   return `${y}-${m}-${d}`;
 };
 
+const formatReviewTime = (value) => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
 export const BookingsPage = () => {
   const navigate = useNavigate();
+  const { currentUser, userProfile } = useAuth();
   const { activeBusiness, loading: businessLoading } = useBusiness();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -192,7 +207,12 @@ export const BookingsPage = () => {
         activeBusiness.id,
         reviewModal.booking.id,
         decision,
-        reviewModal.note
+        reviewModal.note,
+        {
+          uid: currentUser?.uid,
+          name: userProfile?.name || currentUser?.displayName,
+          email: userProfile?.email || currentUser?.email
+        }
       );
       toast.success(decision === 'approve' ? 'Payment approved.' : 'Payment rejected.');
       setReviewModal({ open: false, booking: null, note: '', submitting: false });
@@ -351,10 +371,20 @@ export const BookingsPage = () => {
     name: item.title || item.name || 'Service'
   }));
 
+  const isWaitingReview = (item) =>
+    String(item.status || '').toLowerCase() === 'awaiting_payment' &&
+    String(item.paymentStatus || '').toLowerCase() === 'proof_submitted';
+
+  const waitingReviewCount = bookings.filter((item) => item.date === selectedDate && isWaitingReview(item)).length;
+
   const filteredBookings = bookings
     .filter((item) => item.date === selectedDate)
     .filter((item) => (selectedServiceId === 'all' ? true : item.serviceId === selectedServiceId))
-    .filter((item) => (selectedStatus === 'all' ? true : String(item.status || '').toLowerCase() === selectedStatus))
+    .filter((item) => {
+      if (selectedStatus === 'all') return true;
+      if (selectedStatus === 'waiting_review') return isWaitingReview(item);
+      return String(item.status || '').toLowerCase() === selectedStatus;
+    })
     .sort((a, b) => {
       const aQueue = Number(a.queuePosition || 0);
       const bQueue = Number(b.queuePosition || 0);
@@ -388,6 +418,7 @@ export const BookingsPage = () => {
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
         selectedDate={selectedDate}
+        waitingReviewCount={waitingReviewCount}
       />
       
       {/* Bento Booking Table */}
@@ -628,6 +659,28 @@ export const BookingsPage = () => {
               <p className="text-sm text-on-surface-variant">Check transfer proof before confirming booking.</p>
             </div>
             <div className="p-6 space-y-4">
+              {reviewModal.booking?.paymentReviewedAt && (
+                <div className={`rounded-2xl border p-4 text-sm ${
+                  reviewModal.booking?.paymentStatus === 'approved'
+                    ? 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                    : 'bg-rose-50 border-rose-200 text-rose-900'
+                }`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-semibold">
+                      {reviewModal.booking?.paymentStatus === 'approved' ? 'Payment Approved' : 'Payment Rejected'}
+                    </p>
+                    <span className="text-xs opacity-80">{formatReviewTime(reviewModal.booking.paymentReviewedAt)}</span>
+                  </div>
+                  <p className="mt-1 text-xs opacity-85">
+                    Reviewed by {reviewModal.booking?.paymentReviewedByName || 'Reviewer'}
+                  </p>
+                  {reviewModal.booking?.paymentReviewNote ? (
+                    <p className="mt-3 rounded-xl bg-white/70 px-3 py-2 text-xs">
+                      {reviewModal.booking.paymentReviewNote}
+                    </p>
+                  ) : null}
+                </div>
+              )}
               {reviewModal.booking?.paymentProofUrl ? (
                 <a href={reviewModal.booking.paymentProofUrl} target="_blank" rel="noreferrer" className="block">
                   <img src={reviewModal.booking.paymentProofUrl} alt="Payment proof" className="w-full max-h-80 object-contain rounded-2xl border border-outline-variant/20 bg-surface-container-low" />

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { db } from '../config/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useAuth } from './AuthContext';
+import { BusinessRepository } from '../repositories/BusinessRepository';
 
 const BusinessContext = createContext();
 const ACTIVE_BUSINESS_STORAGE_KEY = 'antreey_active_business_id';
@@ -33,6 +34,8 @@ export function BusinessProvider({ children }) {
   };
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!currentUser) {
       setBusinesses([]);
       setActiveBusiness(null);
@@ -49,6 +52,45 @@ export function BusinessProvider({ children }) {
       setActiveBusinessId('');
       setLoading(false);
       return;
+    }
+
+    if (role === 'staff') {
+      setLoading(true);
+      BusinessRepository.getBusinessesForCustomer(currentUser.uid)
+        .then((businessList) => {
+          if (cancelled) return;
+          setBusinesses(businessList);
+
+          if (businessList.length === 0) {
+            setActiveBusiness(null);
+            setActiveBusinessId('');
+            localStorage.removeItem(ACTIVE_BUSINESS_STORAGE_KEY);
+            return;
+          }
+
+          const persistedId = localStorage.getItem(ACTIVE_BUSINESS_STORAGE_KEY);
+          const preferredId = activeBusinessId || persistedId || businessList[0].id;
+          const nextActive = businessList.find((business) => business.id === preferredId) || businessList[0];
+
+          setActiveBusiness(nextActive);
+          setActiveBusinessId(nextActive.id);
+          localStorage.setItem(ACTIVE_BUSINESS_STORAGE_KEY, nextActive.id);
+        })
+        .catch((error) => {
+          if (!cancelled) {
+            console.error('Error loading staff businesses:', error);
+            setBusinesses([]);
+            setActiveBusiness(null);
+            setActiveBusinessId('');
+          }
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+
+      return () => {
+        cancelled = true;
+      };
     }
 
     setLoading(true);
