@@ -33,6 +33,7 @@ export const SignUp = () => {
         ownerId: userCredential.user.uid,
         address: 'Set your address',
         category: 'Other',
+        isPublic: true,
         createdAt: new Date().toISOString()
       });
 

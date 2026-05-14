@@ -1,8 +1,8 @@
 # Antreey Project Status & Roadmap
 
-Document updated: 2026-05-12
+Document updated: 2026-05-14
 
-## 📊 Overall Progress: 98%
+## 📊 Overall Progress: 99%
 Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now moving into the final logic integration and AI enhancement phases.
 
 ---
@@ -87,6 +87,7 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Weekly Metrics Accuracy Fix**: Schedule header bookings count now aligned with visible weekly slots and active statuses.
 - [x] **Dynamic Hour Range in Weekly Schedule**: Time axis now auto-expands based on staff working hours (not hardcoded to 17:00).
 - [x] **Staff Duplicate Guard**: Prevent adding the same staff user twice in one business (dropdown filter + save-time validation).
+- [x] **Dashboard Command Center Upgrade**: Owner dashboard now uses live Firestore data for business overview, today operations, selected-date bookings, calendar badges, payment attention queue, staff readiness, approved deposits, and service performance insights.
 
 ### Phase 8.5: Role-Based Access Control (RBAC) (IN PROGRESS)
 - [x] **Role Definition**: Implement `role` logic in `AuthContext` (Owner, Staff, Customer).
@@ -120,3 +121,4 @@ Phase 1-7 (UI Slicing & Firebase Foundation) are **COMPLETED**. We are now movin
 - [x] **Customer Payment Status UX**: `My Bookings` now shows clear one-line badge for proof submitted state (`Proof Sent · Waiting Review`).
 - [x] **Operational Notification Center**: Business-scoped notifications now track booking/payment events with unread badge and topbar dropdown for owner/staff.
 - [ ] **Hard Transaction Locking**: Move critical conflict validation into Firestore transaction/cloud function for race-condition proofing.
+- [ ] **Dashboard Deep Analytics**: Add richer trend analytics, revenue breakdown, staff utilization comparison, and exportable business health summary.

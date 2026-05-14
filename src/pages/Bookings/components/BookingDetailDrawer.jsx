@@ -1,5 +1,6 @@
 import React from 'react';
 import { formatQueueNumber } from '../../../utils/queueNumber';
+import { BookingStatusTimeline } from '../../../components/booking/BookingStatusTimeline';
 
 const formatDateTime = (value) => {
   if (!value) return '-';
@@ -20,21 +21,6 @@ const InfoRow = ({ label, value }) => (
     <span className="text-sm font-semibold text-on-surface text-right break-words">{value || '-'}</span>
   </div>
 );
-
-const TimelineItem = ({ icon, label, value }) => {
-  if (!value) return null;
-  return (
-    <div className="flex gap-3">
-      <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-        <span className="material-symbols-outlined text-[17px]">{icon}</span>
-      </div>
-      <div>
-        <p className="text-sm font-semibold text-on-surface">{label}</p>
-        <p className="text-xs text-on-surface-variant">{formatDateTime(value)}</p>
-      </div>
-    </div>
-  );
-};
 
 export const BookingDetailDrawer = ({
   booking,
@@ -121,14 +107,7 @@ export const BookingDetailDrawer = ({
 
           <section className="rounded-2xl border border-outline-variant/20 p-4">
             <h3 className="font-semibold text-on-surface mb-4">Timeline</h3>
-            <div className="space-y-4">
-              <TimelineItem icon="add_circle" label="Created" value={booking.createdAt} />
-              <TimelineItem icon="receipt_long" label="Proof Submitted" value={booking.paymentProofSubmittedAt} />
-              <TimelineItem icon="verified" label="Payment Reviewed" value={booking.paymentReviewedAt} />
-              <TimelineItem icon="login" label="Checked-in" value={booking.checkedInAt} />
-              <TimelineItem icon="autoplay" label="Started" value={booking.startedAt} />
-              <TimelineItem icon="task_alt" label="Completed" value={booking.completedAt} />
-            </div>
+            <BookingStatusTimeline booking={booking} />
           </section>
 
           <div className="flex flex-wrap gap-2 pt-1">

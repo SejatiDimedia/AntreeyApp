@@ -209,13 +209,13 @@ export const BookingTable = ({
         <table className="w-full text-left border-collapse">
           <thead className="bg-primary-container/10">
             <tr>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center">Time</th>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 whitespace-nowrap text-center">Queue</th>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center">Customer</th>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center">Service</th>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 whitespace-nowrap text-center">Staff</th>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center">Status</th>
-              <th className="px-5 py-4 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center">Action</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center whitespace-nowrap">Time</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 whitespace-nowrap text-center">Queue</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center whitespace-nowrap">Customer</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center whitespace-nowrap">Service</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 whitespace-nowrap text-center">Staff</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center whitespace-nowrap">Status</th>
+              <th className="px-6 py-6 font-label-md text-on-surface-variant border-b border-outline-variant/20 text-center whitespace-nowrap">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/10">
@@ -225,22 +225,24 @@ export const BookingTable = ({
                   No upcoming reservations found
                 </td>
               </tr>
-            ) : bookings.map((booking) => (
+            ) : bookings.map((booking) => {
+              const needsPaymentReview = booking.status === 'awaiting_payment' && booking.paymentStatus === 'proof_submitted';
+              return (
               <tr
                 key={booking.id}
                 onClick={() => onOpenDetail?.(booking)}
-                className="hover:bg-surface-container-high/40 transition-colors cursor-pointer"
+                className={`transition-colors cursor-pointer ${needsPaymentReview ? 'bg-blue-50/70 hover:bg-blue-50' : 'hover:bg-surface-container-high/40'}`}
               >
-                <td className="px-5 py-4 align-middle">
+                <td className="px-6 py-6 align-middle whitespace-nowrap">
                   <div className={`font-semibold text-[16px] ${booking.status === 'confirmed' ? 'text-primary' : 'text-on-surface'}`}>{booking.timeSlot || '--:--'}</div>
                   <div className="text-xs text-on-surface-variant mt-0.5">{booking.duration || '30 mins'}</div>
                 </td>
-                <td className="px-5 py-4 align-middle whitespace-nowrap">
+                <td className="px-6 py-6 align-middle whitespace-nowrap">
                   <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary-container/40 text-on-primary-container font-bold whitespace-nowrap">
                     {formatQueueNumber(booking.queuePosition, queueConfig)}
                   </span>
                 </td>
-                <td className="px-5 py-4 align-middle">
+                <td className="px-6 py-6 align-middle whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     {booking.customerImg ? (
                       <img src={booking.customerImg} alt={booking.customerName} className="w-10 h-10 rounded-full border border-outline-variant/20 object-cover" />
@@ -255,16 +257,16 @@ export const BookingTable = ({
                     </div>
                   </div>
                 </td>
-                <td className="px-5 py-4 align-middle">
+                <td className="px-6 py-6 align-middle whitespace-nowrap">
                   <span className="bg-white/60 px-3 py-1 rounded-full text-xs font-semibold border border-outline-variant/20">{booking.serviceName || 'Service'}</span>
                 </td>
-                <td className="px-5 py-4 align-middle whitespace-nowrap">
+                <td className="px-6 py-6 align-middle whitespace-nowrap">
                   <div className="bg-secondary-container/50 px-3 py-1 rounded-full inline-block text-xs font-semibold whitespace-nowrap">{booking.staffName || 'Any Staff'}</div>
                 </td>
-                <td className="px-5 py-4 align-middle">
+                <td className="px-6 py-6 align-middle whitespace-nowrap">
                   {renderStatus(booking.status, booking.paymentStatus)}
                 </td>
-                <td className="px-5 py-4 align-middle text-right" onClick={(event) => event.stopPropagation()}>
+                <td className="px-6 py-6 align-middle text-right whitespace-nowrap" onClick={(event) => event.stopPropagation()}>
                   <div className="flex items-center justify-end gap-2">
                     {booking.status === 'pending' && (
                       <button
@@ -315,7 +317,8 @@ export const BookingTable = ({
                   </div>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

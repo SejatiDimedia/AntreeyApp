@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BookingFilters } from './components/BookingFilters';
 import { BookingTable } from './components/BookingTable';
 import { BookingDetailDrawer } from './components/BookingDetailDrawer';
+import { PaymentReviewInbox } from './components/PaymentReviewInbox';
 import { CalendarCard } from './components/CalendarCard';
 import { WeeklyChart } from './components/WeeklyChart';
 import { Promotions } from './components/Promotions';
@@ -377,7 +378,10 @@ export const BookingsPage = () => {
     String(item.status || '').toLowerCase() === 'awaiting_payment' &&
     String(item.paymentStatus || '').toLowerCase() === 'proof_submitted';
 
-  const waitingReviewCount = bookings.filter((item) => item.date === selectedDate && isWaitingReview(item)).length;
+  const waitingReviewBookings = bookings
+    .filter((item) => item.date === selectedDate && isWaitingReview(item))
+    .sort((a, b) => String(b.paymentProofSubmittedAt || b.createdAt || '').localeCompare(String(a.paymentProofSubmittedAt || a.createdAt || '')));
+  const waitingReviewCount = waitingReviewBookings.length;
   const queueConfig = {
     prefix: activeBusiness?.queuePrefix || 'A',
     padLength: Number(activeBusiness?.queuePadLength || 1)
@@ -426,6 +430,15 @@ export const BookingsPage = () => {
         onStatusChange={setSelectedStatus}
         selectedDate={selectedDate}
         waitingReviewCount={waitingReviewCount}
+      />
+
+      <PaymentReviewInbox
+        items={waitingReviewBookings}
+        selectedDate={selectedDate}
+        onReviewPayment={openPaymentReview}
+        onOpenDetail={(booking) => setDetailBookingId(booking.id)}
+        onShowAll={() => setSelectedStatus(waitingReviewCount > 0 ? 'waiting_review' : 'all')}
+        queueConfig={queueConfig}
       />
       
       {/* Bento Booking Table */}

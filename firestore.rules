@@ -32,6 +32,10 @@ service cloud.firestore {
         || isGlobalAdmin()
         || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
     }
+    function isPublicBusiness(businessId) {
+      return exists(/databases/$(database)/documents/businesses/$(businessId))
+        && get(/databases/$(database)/documents/businesses/$(businessId)).data.isPublic == true;
+    }
 
     function isGlobalAdmin() {
       return isSignedIn()
@@ -91,8 +95,20 @@ service cloud.firestore {
         'paymentProofUrl',
         'paymentProofNote',
         'paymentStatus',
-        'paymentProofSubmittedAt'
+        'paymentProofSubmittedAt',
+        'paymentReviewedAt',
+        'paymentReviewedBy',
+        'paymentReviewedByName',
+        'paymentReviewDecision',
+        'paymentReviewNote'
       ]);
+    }
+    function isBookingOwner() {
+      return isSignedIn()
+        && (
+          (('customerId' in resource.data) && resource.data.customerId == request.auth.uid)
+          || (('userId' in resource.data) && resource.data.userId == request.auth.uid)
+        );
     }
 
     match /users/{userId} {
@@ -102,7 +118,7 @@ service cloud.firestore {
     }
 
     match /businesses/{businessId} {
-      allow read: if canAccessBusiness(businessId);
+      allow read: if canAccessBusiness(businessId) || resource.data.isPublic == true;
       allow create: if isSignedIn(); // Allow any signed in user to create a business for now (MVP)
       allow update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
 
@@ -113,32 +129,37 @@ service cloud.firestore {
       }
 
       match /services/{serviceId} {
-        allow read: if canAccessBusiness(businessId);
+        allow read: if canAccessBusiness(businessId) || isPublicBusiness(businessId);
         allow create, update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
       }
 
       match /staff/{staffId} {
-        allow read: if canAccessBusiness(businessId);
+        allow read: if canAccessBusiness(businessId) || isPublicBusiness(businessId);
         allow create, update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
       }
 
       match /resources/{resourceId} {
-        allow read: if canAccessBusiness(businessId);
+        allow read: if canAccessBusiness(businessId) || isPublicBusiness(businessId);
         allow create, update, delete: if isBusinessManager(businessId) || isGlobalAdmin() || (isSignedIn() && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerId == request.auth.uid);
       }
 
       match /bookings/{bookingId} {
-        allow read: if canAccessBusiness(businessId);
+        allow read: if canAccessBusiness(businessId) || isBookingOwner() || (isSignedIn() && isPublicBusiness(businessId));
 
-        allow create: if canAccessBusiness(businessId)
+        allow create: if (canAccessBusiness(businessId) || (isSignedIn() && isPublicBusiness(businessId)))
           && (
             !('userId' in request.resource.data)
             || request.resource.data.userId == request.auth.uid
+          )
+          && (
+            !('customerId' in request.resource.data)
+            || request.resource.data.customerId == request.auth.uid
           );
 
         allow update: if canOperateBookings(businessId)
           || (
             isSignedIn()
+            && isBookingOwner()
             && isPaymentProofUpdateOnly()
           );
 

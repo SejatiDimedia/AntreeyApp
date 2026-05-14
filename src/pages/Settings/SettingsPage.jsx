@@ -19,6 +19,7 @@ export const SettingsPage = () => {
     queuePrefix: 'A',
     queuePadLength: 1,
     queuePadLengthInput: '1',
+    isPublic: true,
     operatingHours: DEFAULT_OPERATING_HOURS,
     paymentMethods: []
   });
@@ -34,6 +35,7 @@ export const SettingsPage = () => {
       queuePrefix: activeBusiness.queuePrefix || 'A',
       queuePadLength: Number(activeBusiness.queuePadLength || 1),
       queuePadLengthInput: String(activeBusiness.queuePadLength || 1),
+      isPublic: activeBusiness.isPublic !== false,
       operatingHours: normalizeOperatingHours(activeBusiness.operatingHours),
       paymentMethods: Array.isArray(activeBusiness.paymentMethods) ? activeBusiness.paymentMethods : []
     });

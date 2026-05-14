@@ -37,6 +37,7 @@ function App() {
       <Route path="/signup" element={currentUser ? <Navigate to={defaultAuthedPath} replace /> : <SignUp />} />
 
       <Route path="/customer-app" element={<CustomerAppFlow />} />
+      <Route path="/b/:businessId" element={<CustomerAppFlow />} />
 
       <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['owner', 'admin', 'staff']}><MainLayout title="Dashboard"><DashboardPage /></MainLayout></ProtectedRoute>} />
       <Route path="/bookings" element={<ProtectedRoute allowedRoles={['owner', 'admin', 'staff']}><MainLayout title="Bookings" activeCount={12}><BookingsPage /></MainLayout></ProtectedRoute>} />

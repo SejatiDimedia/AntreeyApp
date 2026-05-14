@@ -228,43 +228,59 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-surface-bright pb-24">
-      {/* Header */}
-      <div className="bg-white px-6 py-4 flex items-center justify-between border-b border-outline-variant/20 sticky top-0 z-10">
-        <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors">
-          <span className="material-symbols-outlined">arrow_back</span>
-        </button>
-        <h1 className="font-label-md text-[16px]">Book Appointment</h1>
-        <div className="w-10"></div> {/* Spacer for centering */}
+    <div className="flex flex-col min-h-full bg-surface-bright pb-32">
+      {/* Premium Header */}
+      <div className="bg-white/80 backdrop-blur-xl px-6 py-5 flex items-center justify-between border-b border-outline-variant/10 sticky top-0 z-30">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onBack} 
+            className="w-11 h-11 flex items-center justify-center rounded-2xl bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-all active:scale-95"
+          >
+            <span className="material-symbols-outlined text-[22px]">arrow_back</span>
+          </button>
+          <div>
+            <h1 className="text-[18px] font-black text-on-surface tracking-tight">Book Appointment</h1>
+            <p className="text-[11px] text-on-surface-variant/60 font-bold uppercase tracking-widest mt-0.5">Selection Process</p>
+          </div>
+        </div>
+        <div className="w-11"></div>
       </div>
 
-      <div className="px-6 py-6 space-y-8">
+      <div className="px-6 py-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Selected Service Summary */}
-        <div className="bg-primary/5 border border-primary/20 rounded-[24px] p-4 flex gap-4 items-center">
-          <div className="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center">
-            <span className="material-symbols-outlined">{(!service.icon || service.icon === 'content_cut') ? 'inventory_2' : service.icon}</span>
+        <div className="glass-card rounded-[32px] p-5 flex gap-5 items-center shadow-sm relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl rounded-full" />
+          <div className="w-16 h-16 rounded-2xl bg-surface-bright text-primary flex items-center justify-center shrink-0 shadow-inner group-hover:bg-primary group-hover:text-on-primary transition-colors duration-500">
+            <span className="material-symbols-outlined text-[32px]">{(!service.icon || service.icon === 'content_cut') ? 'inventory_2' : service.icon}</span>
           </div>
-          <div>
-            <p className="font-label-md text-[16px] text-on-surface">{service.name}</p>
-            <p className="text-[13px] text-on-surface-variant flex items-center gap-2 mt-1">
-              <span className="font-semibold text-primary">
+          <div className="flex-1 min-w-0">
+            <p className="font-black text-lg text-on-surface tracking-tight mb-1">{service.name}</p>
+            <div className="flex items-center gap-2">
+              <span className="bg-primary/10 text-primary px-2.5 py-0.5 rounded-lg text-[12px] font-black">
                 {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(service.price)}
               </span>
-              <span>•</span>
-              <span>{service.duration || service.durationMinutes} Min</span>
-            </p>
+              <div className="w-1 h-1 bg-outline-variant/30 rounded-full" />
+              <span className="text-[12px] font-black text-on-surface-variant/50 uppercase tracking-tighter flex items-center gap-1">
+                <span className="material-symbols-outlined text-[14px]">timer</span>
+                {service.duration || service.durationMinutes} Min
+              </span>
+            </div>
           </div>
         </div>
 
         {/* Date Selection */}
         <div>
-          <div className="flex justify-between items-end mb-4">
-            <h2 className="font-label-md text-[18px]">Select Date</h2>
-            <span className="text-[13px] text-primary font-semibold">
-              {new Date(selectedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </span>
+          <div className="flex justify-between items-end mb-6 px-1">
+            <div>
+              <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-1">Step 1</p>
+              <h2 className="text-xl font-black text-on-surface tracking-tight">Choose Date</h2>
+            </div>
+            <div className="bg-surface-container-high text-on-surface-variant text-[10px] font-black uppercase px-3 py-1.5 rounded-lg tracking-widest">
+              {new Date(selectedDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+            </div>
           </div>
-          <div className="flex justify-between gap-2 overflow-x-auto no-scrollbar">
+          
+          <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
             {dates.map((d, i) => (
               <button 
                 key={i}
@@ -272,14 +288,14 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
                   setSelectedDate(d.fullDate);
                   setSelectedTime(null);
                 }}
-                className={`flex flex-col items-center justify-center w-16 h-20 rounded-2xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center min-w-[72px] h-[92px] rounded-[32px] border-2 transition-all duration-300 active:scale-95 ${
                   selectedDate === d.fullDate
-                    ? 'border-primary bg-primary text-white shadow-lg shadow-primary/20' 
-                    : 'border-outline-variant/30 bg-white text-on-surface hover:border-primary/50'
+                    ? 'border-primary bg-primary text-on-primary shadow-xl shadow-primary/20 scale-105' 
+                    : 'border-outline-variant/10 bg-surface-container-low text-on-surface hover:border-primary/40'
                 }`}
               >
-                <span className={`text-[12px] ${selectedDate === d.fullDate ? 'opacity-90' : 'text-on-surface-variant'}`}>{d.day}</span>
-                <span className="font-headline-lg-mobile text-[20px] mt-1">{d.date}</span>
+                <span className={`text-[10px] font-black uppercase tracking-widest mb-1.5 ${selectedDate === d.fullDate ? 'text-on-primary/70' : 'text-on-surface-variant/40'}`}>{d.day}</span>
+                <span className="text-2xl font-black tracking-tighter leading-none">{d.date}</span>
               </button>
             ))}
           </div>
@@ -287,103 +303,153 @@ export const BookingFlowPage = ({ businessId, service, onBack, onConfirm }) => {
 
         {/* Time Selection */}
         <div>
-          <h2 className="font-label-md text-[18px] mb-4">Available Time</h2>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex justify-between items-end mb-6 px-1">
+            <div>
+              <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-1">Step 2</p>
+              <h2 className="text-xl font-black text-on-surface tracking-tight">Select Time</h2>
+            </div>
+            <div className="flex items-center gap-2">
+               <div className="flex items-center gap-1.5">
+                 <div className="w-2 h-2 bg-outline-variant/30 rounded-full" />
+                 <span className="text-[10px] font-black text-on-surface-variant/40 uppercase">Booked</span>
+               </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
             {timeSlots.map((time, i) => {
               const isBooked = isBookedByRange(time);
               const disabled = isPastSlot(time) || isBooked;
+              const isSelected = selectedTime === time;
+              
               return (
-              <button 
-                key={i}
-                onClick={() => {
-                  if (!disabled) setSelectedTime(time);
-                }}
-                disabled={disabled}
-                className={`px-5 py-3 rounded-full font-label-md text-[14px] transition-all border-2 ${
-                  disabled
-                    ? 'border-outline-variant/20 bg-surface-container text-on-surface-variant/50 cursor-not-allowed'
-                    :
-                  selectedTime === time 
-                    ? 'border-primary bg-primary/10 text-primary' 
-                    : 'border-outline-variant/30 bg-white text-on-surface hover:border-primary/50'
-                }`}
-              >
-                {time}{isBooked ? ' (Booked)' : ''}
-              </button>
-            )})}
+                <button 
+                  key={i}
+                  onClick={() => {
+                    if (!disabled) setSelectedTime(time);
+                  }}
+                  disabled={disabled}
+                  className={`h-14 rounded-2xl font-black text-sm transition-all border-2 flex items-center justify-center gap-1.5 active:scale-[0.96] ${
+                    disabled
+                      ? 'border-outline-variant/10 bg-surface-bright text-on-surface-variant/20 cursor-not-allowed opacity-50'
+                      :
+                    isSelected 
+                      ? 'border-primary bg-primary/10 text-primary shadow-lg shadow-primary/5' 
+                      : 'border-outline-variant/10 bg-surface-container-low text-on-surface hover:border-primary/40'
+                  }`}
+                >
+                  <span className="tracking-tight">{time}</span>
+                  {isBooked && <span className="material-symbols-outlined text-[16px] opacity-40">lock</span>}
+                </button>
+              )
+            })}
           </div>
-          <p className="text-[12px] text-on-surface-variant mt-2">
-            You can book up to 7 days ahead. Past time slots are disabled only for today.
-          </p>
+          <div className="mt-4 p-4 rounded-2xl bg-surface-container-low border border-outline-variant/10 flex gap-3">
+             <span className="material-symbols-outlined text-on-surface-variant/40 text-[20px]">info</span>
+             <p className="text-[11px] font-medium text-on-surface-variant/60 leading-relaxed">
+               Slots are updated in real-time. You can book up to 7 days ahead for any available time window.
+             </p>
+          </div>
         </div>
 
-        {/* Staff Selection (Optional) */}
+        {/* Staff Selection */}
         <div>
-          <h2 className="font-label-md text-[18px] mb-4">Select Professional <span className="text-on-surface-variant text-[12px] font-normal">(Optional)</span></h2>
-          <div className="flex flex-col gap-3">
-            <div 
+          <div className="flex justify-between items-end mb-6 px-1">
+            <div>
+              <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em] mb-1">Step 3</p>
+              <h2 className="text-xl font-black text-on-surface tracking-tight">Professional <span className="text-on-surface-variant/30 font-medium">(Optional)</span></h2>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <button 
               onClick={() => setSelectedStaff(null)}
-              className={`p-4 rounded-[20px] border-2 flex items-center gap-4 transition-all cursor-pointer ${
-                selectedStaff === null ? 'border-primary bg-primary/5' : 'border-outline-variant/30 bg-white'
+              className={`w-full p-5 rounded-[32px] border-2 flex items-center gap-4 transition-all active:scale-[0.98] text-left ${
+                selectedStaff === null ? 'border-primary bg-primary/5' : 'border-outline-variant/10 bg-surface-container-low'
               }`}
             >
-              <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-                <span className="material-symbols-outlined">group</span>
+              <div className="w-14 h-14 rounded-2xl bg-surface-bright flex items-center justify-center text-on-surface-variant/40 shadow-inner">
+                <span className="material-symbols-outlined text-[32px]">group</span>
               </div>
               <div className="flex-1">
-                <p className="font-label-md text-[15px]">Any Available Staff</p>
-                <p className="text-[12px] text-on-surface-variant">Fastest available</p>
+                <p className="font-black text-on-surface text-lg tracking-tight leading-none mb-1">Any Professional</p>
+                <p className="text-[12px] font-medium text-on-surface-variant/40 uppercase tracking-widest">Fastest available slot</p>
               </div>
-              {selectedStaff === null && <span className="material-symbols-outlined text-primary">check_circle</span>}
-            </div>
+              {selectedStaff === null && (
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                  <span className="material-symbols-outlined text-[20px]">check</span>
+                </div>
+              )}
+            </button>
 
-            {availableStaffList.length === 0 && <p className="text-[12px] text-on-surface-variant ml-2">No available staff in selected date/time</p>}
+            {availableStaffList.length === 0 && selectedTime && (
+              <div className="py-10 text-center">
+                 <span className="material-symbols-outlined text-on-surface-variant/20 text-[40px] mb-2">person_off</span>
+                 <p className="text-xs font-black text-on-surface-variant/30 uppercase tracking-widest">No specific staff available</p>
+              </div>
+            )}
 
             {availableStaffList.map(staff => (
-              <div 
+              <button 
                 key={staff.id}
                 onClick={() => setSelectedStaff(staff)}
-                className={`p-4 rounded-[20px] border-2 flex items-center gap-4 transition-all cursor-pointer ${
-                  selectedStaff?.id === staff.id ? 'border-primary bg-primary/5' : 'border-outline-variant/30 bg-white'
+                className={`w-full p-5 rounded-[32px] border-2 flex items-center gap-4 transition-all active:scale-[0.98] text-left ${
+                  selectedStaff?.id === staff.id ? 'border-primary bg-primary/5' : 'border-outline-variant/10 bg-surface-container-low'
                 }`}
               >
-                <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant overflow-hidden">
-                  <span className="material-symbols-outlined text-[30px] mt-2">person</span>
+                <div className="w-14 h-14 rounded-2xl bg-surface-bright flex items-center justify-center text-on-surface-variant/40 overflow-hidden relative group">
+                  <span className="material-symbols-outlined text-[40px] mt-2">person</span>
                 </div>
                 <div className="flex-1">
-                  <p className="font-label-md text-[15px]">{staff.name}</p>
-                  <p className="text-[12px] text-on-surface-variant">{staff.role || 'Professional'}</p>
+                  <p className="font-black text-on-surface text-lg tracking-tight leading-none mb-1">{staff.name}</p>
+                  <p className="text-[12px] font-medium text-on-surface-variant/40 uppercase tracking-widest">{staff.role || 'Professional Specialist'}</p>
                 </div>
-                {selectedStaff?.id === staff.id && <span className="material-symbols-outlined text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>}
-              </div>
+                {selectedStaff?.id === staff.id && (
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+                    <span className="material-symbols-outlined text-[20px]">check</span>
+                  </div>
+                )}
+              </button>
             ))}
           </div>
         </div>
       </div>
 
       {/* Sticky Bottom Bar */}
-      <div className="fixed md:absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-outline-variant/20 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] rounded-b-[40px] z-20">
-        {submitError && (
-          <div className="mb-3 rounded-2xl border border-error/30 bg-error-container/70 text-on-error-container px-4 py-3 flex items-start gap-2">
-            <span className="material-symbols-outlined text-[20px] mt-[1px]">error</span>
-            <div>
-              <p className="text-sm font-semibold">Booking was not completed</p>
-              <p className="text-xs opacity-90">{submitError}</p>
+      <div className="fixed md:absolute bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-xl border-t border-outline-variant/10 shadow-[0_-20px_40px_rgba(0,0,0,0.05)] rounded-t-[40px] z-40">
+        <div className="max-w-[380px] mx-auto">
+          {submitError && (
+            <div className="mb-4 rounded-2xl bg-rose-50 border border-rose-100 p-4 flex gap-3 items-center animate-in fade-in zoom-in-95">
+              <span className="material-symbols-outlined text-rose-600">error</span>
+              <p className="text-[12px] font-black text-rose-800 leading-tight">{submitError}</p>
             </div>
-          </div>
-        )}
-        <button 
-          onClick={handleConfirm}
-          disabled={!selectedTime || loading || !businessId || !currentUser?.uid}
-          className={`w-full py-4 rounded-full font-label-md text-[16px] transition-all flex justify-center items-center gap-2 ${
-            selectedTime && !loading && businessId
-              ? 'bg-primary text-white shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-[0.98]' 
-              : 'bg-surface-container-highest text-on-surface-variant opacity-50 cursor-not-allowed'
-          }`}
-        >
-          {loading ? 'Processing...' : service?.dpRequired !== false ? 'Confirm & Continue to Payment' : 'Confirm Details'}
-          {!loading && <span className="material-symbols-outlined text-[20px]">arrow_forward</span>}
-        </button>
+          )}
+          
+          <button 
+            onClick={handleConfirm}
+            disabled={!selectedTime || loading || !businessId || !currentUser?.uid}
+            className={`w-full h-15 rounded-full font-black text-[16px] transition-all flex justify-center items-center gap-3 relative overflow-hidden ${
+              selectedTime && !loading && businessId
+                ? 'bg-inverse-surface text-inverse-on-surface shadow-2xl shadow-black/20 active:scale-95 hover:opacity-90' 
+                : 'bg-surface-container-low text-on-surface-variant/30 cursor-not-allowed'
+            }`}
+          >
+            {loading ? (
+              <div className="w-5 h-5 border-2 border-inverse-on-surface/20 border-t-inverse-on-surface rounded-full animate-spin" />
+            ) : (
+              <>
+                <span>{service?.dpRequired !== false ? 'Review & Pay' : 'Confirm Booking'}</span>
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </>
+            )}
+          </button>
+          
+          {selectedTime && (
+            <p className="text-center text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-[0.2em] mt-4">
+               {new Date(selectedDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} at {selectedTime}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -62,6 +62,28 @@ export const BusinessProfile = ({ formData, onChange }) => {
       </div>
       
       <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="col-span-1 md:col-span-2 rounded-3xl border border-primary/20 bg-primary-container/10 p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined">share</span>
+            </div>
+            <div>
+              <h4 className="font-label-md text-on-surface">Public Booking Page</h4>
+              <p className="text-sm text-on-surface-variant mt-1">
+                Allow customers to open your storefront link, view services, and start a booking after signing in.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onChange('isPublic', !formData.isPublic)}
+            className={`relative h-9 w-16 rounded-full transition-colors ${formData.isPublic ? 'bg-primary' : 'bg-outline-variant'}`}
+            aria-pressed={Boolean(formData.isPublic)}
+          >
+            <span className={`absolute left-0 top-1 h-7 w-7 rounded-full bg-white shadow-md transition-transform ${formData.isPublic ? 'translate-x-7' : 'translate-x-1'}`} />
+          </button>
+        </div>
+
         <div className="col-span-1 md:col-span-2 grid grid-cols-1 xl:grid-cols-2 gap-5">
           <div className="rounded-3xl bg-surface-container-low border border-outline-variant/30 p-5">
             <div className="flex items-center gap-5">

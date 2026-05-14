@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useBusiness } from '../../context/BusinessContext';
 import { BusinessRepository, NotificationRepository } from '../../repositories';
+import { toast } from 'sonner';
 
 export const TopAppBar = ({ title, activeCount }) => {
   const navigate = useNavigate();
   const { currentUser, userProfile, role, logout } = useAuth();
-  const { businesses, activeBusinessId, selectBusiness } = useBusiness();
+  const { businesses, activeBusiness, activeBusinessId, selectBusiness } = useBusiness();
   const showBusinessSwitcher = (role === 'owner' || role === 'admin' || role === 'staff') && businesses.length > 0;
   const canCreateBusiness = role === 'owner';
 
@@ -25,6 +26,7 @@ export const TopAppBar = ({ title, activeCount }) => {
   const displayRole = (role || 'customer').charAt(0).toUpperCase() + (role || 'customer').slice(1);
   const displayEmail = userProfile?.email || currentUser?.email || '-';
   const unreadCount = notifications.filter((item) => !item.read).length;
+  const storefrontLink = activeBusinessId ? `${window.location.origin}/b/${activeBusinessId}` : '';
 
   useEffect(() => {
     if (!activeBusinessId || !(role === 'owner' || role === 'admin' || role === 'staff')) {
@@ -54,6 +56,26 @@ export const TopAppBar = ({ title, activeCount }) => {
     setIsCreateBusinessOpen(true);
   };
 
+  const handleCopyStorefrontLink = async () => {
+    if (!storefrontLink) return;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(storefrontLink);
+      } else {
+        const tempInput = document.createElement('input');
+        tempInput.value = storefrontLink;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+      }
+      toast.success('Booking link copied.');
+    } catch (error) {
+      console.error('Copy storefront link failed:', error);
+      toast.error('Failed to copy booking link.');
+    }
+  };
+
   const handleCreateBusiness = async (e) => {
     e.preventDefault();
     if (!currentUser?.uid || !businessForm.name.trim()) return;
@@ -66,6 +88,7 @@ export const TopAppBar = ({ title, activeCount }) => {
         phone: businessForm.phone.trim(),
         address: businessForm.address.trim(),
         ownerId: currentUser.uid,
+        isPublic: true,
         createdAt: new Date().toISOString()
       };
 
@@ -185,6 +208,31 @@ export const TopAppBar = ({ title, activeCount }) => {
                   <span className="material-symbols-outlined text-[18px]">storefront</span>
                   Add Business
                 </button>
+              )}
+
+              {activeBusinessId && (
+                <div className="flex items-center gap-2 rounded-xl border border-outline-variant/30 bg-surface-container-lowest px-2 py-1.5">
+                  <span className={`hidden sm:inline-flex h-2 w-2 rounded-full ${activeBusiness?.isPublic ? 'bg-green-500' : 'bg-outline'}`} />
+                  <span className="hidden md:inline text-xs text-on-surface-variant">
+                    {activeBusiness?.isPublic ? 'Public booking page' : 'Private booking page'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleCopyStorefrontLink}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-primary-container/40 px-3 py-1.5 text-xs font-semibold text-on-primary-container hover:bg-primary-container/70 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                    Copy Link
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.open(storefrontLink, '_blank', 'noopener,noreferrer')}
+                    className="inline-flex items-center justify-center rounded-lg px-2 py-1.5 text-on-surface-variant hover:bg-surface-container-high transition-colors"
+                    aria-label="Open booking page"
+                  >
+                    <span className="material-symbols-outlined text-[17px]">open_in_new</span>
+                  </button>
+                </div>
               )}
             </div>
 

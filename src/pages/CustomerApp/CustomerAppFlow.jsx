@@ -4,7 +4,7 @@ import { BookingFlowPage } from './BookingFlowPage';
 import { TicketPage } from './TicketPage';
 import { MyBookingsPage } from './MyBookingsPage';
 import { BusinessRepository } from '../../repositories/BusinessRepository';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useBusiness } from '../../context/BusinessContext';
 import { useAuth } from '../../context/AuthContext';
 import { BookingRepository } from '../../repositories/BookingRepository';
@@ -13,6 +13,7 @@ const ACTIVE_BUSINESS_STORAGE_KEY = 'antreey_active_business_id';
 
 export const CustomerAppFlow = () => {
   const navigate = useNavigate();
+  const { businessId: businessIdFromPath } = useParams();
   const [searchParams] = useSearchParams();
   const { activeBusinessId: contextBusinessId } = useBusiness();
   const { currentUser, userProfile, logout } = useAuth();
@@ -27,6 +28,9 @@ export const CustomerAppFlow = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [awaitingPaymentCount, setAwaitingPaymentCount] = useState(0);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const customerDisplayName = userProfile?.name || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Customer';
+  const customerEmail = userProfile?.email || currentUser?.email || '';
 
   useEffect(() => {
     async function fetchData() {
@@ -35,7 +39,7 @@ export const CustomerAppFlow = () => {
         const businessIdFromQuery = searchParams.get('businessId');
         const businessIdFromStorage = localStorage.getItem(ACTIVE_BUSINESS_STORAGE_KEY);
         const isCustomer = (userProfile?.role || 'customer') === 'customer';
-        let resolvedBusinessId = businessIdFromQuery || contextBusinessId || (!isCustomer ? businessIdFromStorage : null);
+        let resolvedBusinessId = businessIdFromPath || businessIdFromQuery || contextBusinessId || (!isCustomer ? businessIdFromStorage : null);
         let businessData = null;
 
         if (isCustomer && currentUser?.uid) {
@@ -98,7 +102,7 @@ export const CustomerAppFlow = () => {
       }
     }
     fetchData();
-  }, [searchParams, contextBusinessId, userProfile?.role, currentUser?.uid]);
+  }, [businessIdFromPath, searchParams, contextBusinessId, userProfile?.role, currentUser?.uid]);
 
   const handleCustomerBusinessChange = (event) => {
     const nextBusinessId = event.target.value;
@@ -159,19 +163,61 @@ export const CustomerAppFlow = () => {
     setStep('storefront');
   };
 
+  const handleCustomerLogout = async () => {
+    setIsAccountMenuOpen(false);
+    await logout();
+    navigate('/signin', { replace: true });
+  };
+
   return (
-    <div className="min-h-screen bg-surface-container-high md:p-6 lg:p-10">
-      <div className="mx-auto w-full md:max-w-[430px] min-h-screen md:min-h-[calc(100vh-3rem)] bg-surface-bright md:rounded-[28px] md:shadow-xl md:overflow-hidden relative">
-        {currentUser && step !== 'ticket' && (
-          <button
-            onClick={async () => {
-              await logout();
-              navigate('/signin', { replace: true });
-            }}
-            className="fixed md:absolute top-4 right-4 z-40 bg-white/90 text-on-surface px-3 py-2 rounded-xl shadow-sm border border-outline-variant/30 hover:bg-white"
-          >
-            <span className="text-[12px] font-semibold">Logout</span>
-          </button>
+    <div className="min-h-screen bg-surface-bright flex items-center justify-center md:p-10 lg:p-16">
+      <div className="mx-auto w-full md:max-w-[430px] min-h-screen md:min-h-[880px] bg-surface-bright md:rounded-[48px] md:shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] md:ring-1 md:ring-outline-variant/30 overflow-x-hidden relative flex flex-col">
+        {currentUser && step !== 'ticket' && step !== 'mybookings' && (
+          <div className="fixed md:absolute top-4 right-4 z-40">
+            <button
+              type="button"
+              onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+              className="backdrop-blur-md w-10 h-10 rounded-2xl bg-white/18 border border-white/25 text-white backdrop-blur-md shadow-lg"
+              aria-label="Open account menu"
+              aria-expanded={isAccountMenuOpen}
+            >
+              <span className="material-symbols-outlined text-[22px]">more_vert</span>
+            </button>
+
+            {isAccountMenuOpen && (
+              <>
+                <button
+                  type="button"
+                  className="fixed inset-0 md:absolute md:inset-auto md:-top-4 md:-right-4 md:w-[430px] md:h-screen cursor-default"
+                  aria-label="Close account menu"
+                  onClick={() => setIsAccountMenuOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-[280px] rounded-3xl bg-white shadow-2xl border border-outline-variant/20 overflow-hidden">
+                  <div className="p-4 bg-surface-container-low">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center font-bold uppercase">
+                        {customerDisplayName.slice(0, 2)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-on-surface truncate">{customerDisplayName}</p>
+                        <p className="text-xs text-on-surface-variant truncate">{customerEmail || 'Signed in customer'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2">
+                    <button
+                      type="button"
+                      onClick={handleCustomerLogout}
+                      className="w-full flex items-center gap-3 px-3 py-3 rounded-2xl text-left text-error hover:bg-error-container/60 transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">logout</span>
+                      <span className="text-sm font-semibold">Logout</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         )}
         {step === 'storefront' && (
           <StorefrontPage
@@ -184,21 +230,21 @@ export const CustomerAppFlow = () => {
             awaitingPaymentCount={awaitingPaymentCount}
             onBusinessChange={handleCustomerBusinessChange}
             onOpenMyBookings={() => setStep('mybookings')}
-            onServiceSelect={handleServiceSelect} 
+            onServiceSelect={handleServiceSelect}
           />
         )}
-        
+
         {step === 'booking' && (
-          <BookingFlowPage 
+          <BookingFlowPage
             businessId={activeBusinessId}
-            service={selectedService} 
+            service={selectedService}
             onBack={handleBackToStorefront}
             onConfirm={handleBookingConfirm}
           />
         )}
 
         {step === 'ticket' && (
-          <TicketPage 
+          <TicketPage
             businessId={activeBusinessId}
             bookingId={activeBookingId}
             onHome={() => setStep(ticketBackStep)}

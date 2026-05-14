@@ -178,7 +178,12 @@ export const BookingRepository = {
         paymentProofUrl: payload.paymentProofUrl || '',
         paymentProofNote: payload.paymentProofNote || '',
         paymentStatus: 'proof_submitted',
-        paymentProofSubmittedAt: new Date().toISOString()
+        paymentProofSubmittedAt: new Date().toISOString(),
+        paymentReviewedAt: '',
+        paymentReviewedBy: '',
+        paymentReviewedByName: '',
+        paymentReviewDecision: '',
+        paymentReviewNote: ''
       });
       await notifyBusiness(businessId, {
         type: 'payment_proof_submitted',
