@@ -54,7 +54,7 @@ export const OperatingHours = ({ value = {}, onChange }) => {
   };
 
   return (
-    <section className="glass-card rounded-[24px] overflow-hidden">
+    <section id="operating-hours" className="glass-card rounded-[24px] overflow-hidden scroll-mt-28">
       <div className="p-8 border-b border-outline-variant/30 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
           <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Operating Hours</h2>

@@ -55,7 +55,7 @@ export const BusinessProfile = ({ formData, onChange }) => {
   };
 
   return (
-    <section className="glass-card rounded-[24px] overflow-hidden">
+    <section id="business-profile" className="glass-card rounded-[24px] overflow-hidden scroll-mt-28">
       <div className="p-8 border-b border-outline-variant/30">
         <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Business Profile</h2>
         <p className="text-on-surface-variant text-body-md mt-1">This information will be visible to your customers on the booking page.</p>
@@ -176,6 +176,28 @@ export const BusinessProfile = ({ formData, onChange }) => {
             <option>Creative Agency</option>
             <option>Sports Venue</option>
           </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="font-label-md text-on-surface">Business Phone</label>
+          <input
+            className="w-full p-4 bg-surface-container-low focus:bg-surface-container-lowest rounded-xl border-none outline-none focus:ring-2 focus:ring-primary text-body-md transition-all"
+            type="tel"
+            placeholder="+62 812 3456 7890"
+            value={formData.phone || ''}
+            onChange={(e) => onChange('phone', e.target.value)}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="font-label-md text-on-surface">Business Address</label>
+          <input
+            className="w-full p-4 bg-surface-container-low focus:bg-surface-container-lowest rounded-xl border-none outline-none focus:ring-2 focus:ring-primary text-body-md transition-all"
+            type="text"
+            placeholder="Street, city, province"
+            value={formData.address || ''}
+            onChange={(e) => onChange('address', e.target.value)}
+          />
         </div>
         
         <div className="col-span-1 md:col-span-2 space-y-2">

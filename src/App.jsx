@@ -13,6 +13,7 @@ import { CustomersPage } from './pages/Customers/CustomersPage';
 import { SettingsPage } from './pages/Settings/SettingsPage';
 import { SignIn } from './pages/Auth/SignIn';
 import { SignUp } from './pages/Auth/SignUp';
+import { LandingPage } from './pages/LandingPage';
 
 const adminPages = ['/dashboard', '/bookings', '/staff', '/services', '/customers', '/settings'];
 
@@ -32,7 +33,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={currentUser ? defaultAuthedPath : '/signin'} replace />} />
+      <Route path="/" element={currentUser ? <Navigate to={defaultAuthedPath} replace /> : <LandingPage />} />
       <Route path="/signin" element={currentUser ? <Navigate to={defaultAuthedPath} replace /> : <SignIn />} />
       <Route path="/signup" element={currentUser ? <Navigate to={defaultAuthedPath} replace /> : <SignUp />} />
 

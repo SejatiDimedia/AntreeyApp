@@ -10,10 +10,13 @@ import { toast } from 'sonner';
 
 export const SettingsPage = () => {
   const { activeBusiness } = useBusiness();
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     description: '',
+    phone: '',
+    address: '',
     logoUrl: '',
     coverImageUrl: '',
     queuePrefix: 'A',
@@ -21,24 +24,43 @@ export const SettingsPage = () => {
     queuePadLengthInput: '1',
     isPublic: true,
     operatingHours: DEFAULT_OPERATING_HOURS,
-    paymentMethods: []
+    paymentMethods: [],
+    notificationPreferences: {
+      paymentReview: true,
+      newBooking: true,
+      dailySummary: true,
+      customerUpdates: true
+    }
   });
+
+  const buildFormFromBusiness = (business) => {
+    if (!business) return null;
+    return {
+      name: business.name || '',
+      category: business.category || '',
+      description: business.description || '',
+      phone: business.phone || '',
+      address: business.address || '',
+      logoUrl: business.logoUrl || business.logo || '',
+      coverImageUrl: business.coverImageUrl || business.bannerUrl || business.imageUrl || '',
+      queuePrefix: business.queuePrefix || 'A',
+      queuePadLength: Number(business.queuePadLength || 1),
+      queuePadLengthInput: String(business.queuePadLength || 1),
+      isPublic: business.isPublic !== false,
+      operatingHours: normalizeOperatingHours(business.operatingHours),
+      paymentMethods: Array.isArray(business.paymentMethods) ? business.paymentMethods : [],
+      notificationPreferences: {
+        paymentReview: business.notificationPreferences?.paymentReview !== false,
+        newBooking: business.notificationPreferences?.newBooking !== false,
+        dailySummary: business.notificationPreferences?.dailySummary !== false,
+        customerUpdates: business.notificationPreferences?.customerUpdates !== false
+      }
+    };
+  };
 
   useEffect(() => {
     if (!activeBusiness) return;
-    setFormData({
-      name: activeBusiness.name || '',
-      category: activeBusiness.category || '',
-      description: activeBusiness.description || '',
-      logoUrl: activeBusiness.logoUrl || activeBusiness.logo || '',
-      coverImageUrl: activeBusiness.coverImageUrl || activeBusiness.bannerUrl || activeBusiness.imageUrl || '',
-      queuePrefix: activeBusiness.queuePrefix || 'A',
-      queuePadLength: Number(activeBusiness.queuePadLength || 1),
-      queuePadLengthInput: String(activeBusiness.queuePadLength || 1),
-      isPublic: activeBusiness.isPublic !== false,
-      operatingHours: normalizeOperatingHours(activeBusiness.operatingHours),
-      paymentMethods: Array.isArray(activeBusiness.paymentMethods) ? activeBusiness.paymentMethods : []
-    });
+    setFormData(buildFormFromBusiness(activeBusiness));
   }, [activeBusiness]);
 
   const handleFieldChange = (field, value) => {
@@ -47,10 +69,28 @@ export const SettingsPage = () => {
 
   const handleSave = async () => {
     if (!activeBusiness?.id) return;
+    setSaving(true);
     try {
+      const paymentMethods = (formData.paymentMethods || [])
+        .map((method) => ({
+          bankName: String(method.bankName || '').trim(),
+          accountName: String(method.accountName || '').trim(),
+          accountNumber: String(method.accountNumber || '').trim(),
+          note: String(method.note || '').trim()
+        }))
+        .filter((method) => method.bankName || method.accountName || method.accountNumber);
+
       const payload = {
         ...formData,
+        name: formData.name.trim(),
+        category: formData.category.trim(),
+        description: formData.description.trim(),
+        phone: formData.phone.trim(),
+        address: formData.address.trim(),
+        queuePrefix: (formData.queuePrefix || 'A').trim().toUpperCase(),
         queuePadLength: Number(formData.queuePadLength || 1),
+        operatingHours: normalizeOperatingHours(formData.operatingHours),
+        paymentMethods,
         updatedAt: new Date().toISOString()
       };
       delete payload.queuePadLengthInput;
@@ -59,23 +99,28 @@ export const SettingsPage = () => {
     } catch (error) {
       console.error('Save business settings failed:', error);
       toast.error('Failed to save settings. Please try again.');
+    } finally {
+      setSaving(false);
     }
+  };
+
+  const handleDiscard = () => {
+    const next = buildFormFromBusiness(activeBusiness);
+    if (next) setFormData(next);
+    toast.message('Unsaved settings have been discarded.');
   };
 
   return (
     <div className="grid grid-cols-12 gap-card-gap pb-12">
-      {/* Navigation Sidebar (Internal) */}
       <div className="col-span-12 lg:col-span-3">
         <SettingsNav />
       </div>
 
-      {/* Configuration Form Area */}
       <div className="col-span-12 lg:col-span-9 space-y-card-gap">
         <BusinessProfile formData={formData} onChange={handleFieldChange} />
         <OperatingHours value={formData.operatingHours} onChange={(value) => handleFieldChange('operatingHours', value)} />
-        <NotificationPreferences />
+        <NotificationPreferences value={formData.notificationPreferences} onChange={(value) => handleFieldChange('notificationPreferences', value)} />
 
-        {/* Save Banner */}
         <div className="glass-card rounded-[24px] p-6 flex flex-col md:flex-row items-center justify-between gap-6 border-2 border-primary/20 mt-8">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
@@ -87,8 +132,14 @@ export const SettingsPage = () => {
             </div>
           </div>
           <div className="flex gap-4 w-full md:w-auto">
-            <button className="flex-1 md:flex-none px-6 py-3 rounded-full border border-outline text-on-surface font-label-md hover:bg-surface-container-high transition-colors">Discard</button>
-            <button onClick={handleSave} className="flex-1 md:flex-none px-8 py-3 rounded-full bg-primary text-white font-label-md shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Save & Update Profile</button>
+            <button onClick={handleDiscard} className="flex-1 md:flex-none px-6 py-3 rounded-full border border-outline text-on-surface font-label-md hover:bg-surface-container-high transition-colors">Discard</button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex-1 md:flex-none px-8 py-3 rounded-full bg-primary text-white font-label-md shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-60 disabled:hover:scale-100"
+            >
+              {saving ? 'Saving...' : 'Save & Update Profile'}
+            </button>
           </div>
         </div>
       </div>

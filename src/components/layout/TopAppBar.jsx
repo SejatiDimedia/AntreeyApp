@@ -236,7 +236,7 @@ export const TopAppBar = ({ title, activeCount }) => {
               )}
             </div>
 
-            <div className="flex items-center gap-2 w-full xl:w-auto">
+            {/* <div className="flex items-center gap-2 w-full xl:w-auto">
               <div className="relative group flex-1">
                 <span className="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
                   <span className="material-symbols-outlined text-[20px]">search</span>
@@ -251,7 +251,7 @@ export const TopAppBar = ({ title, activeCount }) => {
                 <span className="material-symbols-outlined text-[18px]">add</span>
                 <span className="hidden sm:inline">New Booking</span>
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </header>
